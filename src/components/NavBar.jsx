@@ -1,5 +1,6 @@
+import React from 'react';
 import styled from 'styled-components';
-
+import { Link } from 'react-router-dom';
 
 const NavContainer = styled.nav`
   width: 100%;
@@ -14,10 +15,11 @@ const NavContainer = styled.nav`
   z-index: 100;
 `
 
-const NavSearch = styled.div`
-  display: flex;
-  align-items: center;
-  flex-grow: 1;
+const NavBrand = styled(Link)`
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 5px;
 `
 
 const NavButtons = styled.div`
@@ -27,7 +29,7 @@ const NavButtons = styled.div`
 `
 
 const NavButton = styled.button`
-  background-color: #f5c518; /* IMDb 버튼 색상 */
+  background-color: #f5c518;
   color: white;
   height: 30px;
   margin: 5px;
@@ -38,7 +40,7 @@ const NavButton = styled.button`
 const NavBar = () => {
   return(
     <NavContainer>
-      <span className='w-[500px]'>Movie DB</span>
+      <NavBrand to="/">Movie DB</NavBrand>
       <NavButtons>
         <NavButton>로그인</NavButton>
         <NavButton>회원가입</NavButton>

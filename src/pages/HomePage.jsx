@@ -14,31 +14,28 @@ import 'swiper/css/scrollbar';
 const MovieSliderContainer = styled.div`
   width: 100%;
   padding: 20px 0; /* 슬라이드 양 옆 여백 */
-  /* Swiper의 기본 CSS가 적용되므로 여기서는 최소한의 스타일만 */
-
-  /* Swiper 네비게이션 버튼 (화살표) 커스터마이징 */
+  /* 페이지 좌우 화살표 설정 */
   .swiper-button-prev,
   .swiper-button-next {
-    color: #f5c518; /* IMDb 색상 */
+    color: #f5c518; 
     &::after {
-      font-size: 30px; /* 화살표 크기 */
+      font-size: 30px; 
     }
   }
-
-  /* Swiper 페이지네이션 점 커스터마이징 */
+  /* 페이지네이션 점 */
   .swiper-pagination-bullet {
     background-color: #bbb;
     opacity: 0.7;
   }
   .swiper-pagination-bullet-active {
-    background-color: #f5c518; /* 활성 점 색상 */
+    background-color: #f5c518; /* 점 색상 */
     opacity: 1;
   }
 `;
 
 const NoDataMessage = styled.p`
   text-align: center;
-  width: 100%; /* 전체 너비 차지 */
+  width: 100%; 
   color: #718096;
   font-size: 1.2rem;
 `;
@@ -60,8 +57,8 @@ export function HomePage() {
             // Swiper에서 사용할 모듈들 
             modules={[Navigation, Pagination, Scrollbar]}
             // 슬라이드 간 간격 (px)
-            spaceBetween={30} // 한 번에 보여줄 슬라이드 개수 (반응형 설정으로)
-            slidesPerView={5} //한번에 보여줄 슬라이드 개수
+            spaceBetween={30} // 한 번에 보여줄 슬라이드 개수
+            slidesPerView={5} // 한번에 보여줄 슬라이드 개수
             navigation // 네비게이션 버튼 사용
             pagination={{ clickable: true }} // 페이지네이션 (점) 사용
             scrollbar={{ draggable: true }} // 스크롤바 사용
@@ -91,7 +88,7 @@ export function HomePage() {
           >
             {movies.map((movie) => (
               <SwiperSlide key={movie.id}>
-                {/* MovieCard는 SwiperSlide 안에 렌더링 */}
+                {/* SwiperSlide 안에 MovieCard가 렌더링돠어 보여짐 */}
                 <MovieCard movie={movie} />
               </SwiperSlide>
             ))}
