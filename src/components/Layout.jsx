@@ -1,26 +1,35 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import NavBar from './NavBar';
 import { AnimatePresence, motion } from 'framer-motion';
+import NavTop from './NavTop';
+import NavBottom from './NavBottom';
 
 const LayoutContainer = styled.div`
   display: flex;
+  width: 100%;
+  max-width: 780px;
+  height: 100%;
+  margin: 0 auto;
   flex-direction: column;
-  min-height: 100vh;
+  flex-grow: 1;
+  padding: 0;
 `;
 
 const ContentWrapper = styled.div`
   flex-grow: 1;
   width: 100%;
+  justify-content: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* height: 100%; */
+  /* align-items: center; */
 `;
 
 const Layout = () => {
   const location = useLocation(); // 현재 URL 위치 정보 가져오기
-
+  const isDetailPage = location.pathname.includes('/movie/');
+  
   // framer-motion 으로 페이지마다 이동할때 애니메이션 
   const pageAnimate = {
     initial: { opacity: 0.5},
@@ -37,21 +46,23 @@ const Layout = () => {
 
   return (
     <LayoutContainer>
-      <NavBar /> 
-      <ContentWrapper>
-        <AnimatePresence mode='wait'>
-          <motion.div
-            key={location.pathname}
-            variants={pageAnimate}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.2 }}
-            style={{display: 'flex', width: '100%'}}>
-            <Outlet />
-          </motion.div>  
-        </AnimatePresence>
-      </ContentWrapper>
+      <NavTop /> 
+        <ContentWrapper>
+          <AnimatePresence mode='wait'>
+            <motion.div
+              key={location.pathname}
+              variants={pageAnimate}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.2 }}
+              style={{display: 'flex', width:'100%', height: '100%', justifyContent: 'center'}}>
+              {/* Outlet은 라우팅된 페이지 컴포넌트가 렌더링될 위치 */}
+              <Outlet />
+            </motion.div>  
+          </AnimatePresence>
+        </ContentWrapper>
+      <NavBottom />
     </LayoutContainer>
   );
 };
