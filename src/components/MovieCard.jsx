@@ -85,10 +85,14 @@ const MovieCard = ({ movie }) => {
   const handleCardClick = (e) => {
     e.stopPropagation();
   }
+  console.log(movie);
+  if(!movie){
+    return(<p className='text-[white]'>영화가 없어요</p>)
+  }
 
   return (
     // Link컴포넌트로 MovieCardContainer를 감싸서 클릭할때 이동할 수 있게
-    <Link to={`/movie/${movie.id}`}>
+    <Link to={`/movie/${movie?.id}`}>
       <MovieCardContainer>
         <img className='h-[300px]'
         src={`${IMAGE_BASE_URL}${movie.poster_path}`}/>

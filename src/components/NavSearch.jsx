@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useState } from "react";
 import styled from "styled-components"
-import { useLocation, useNavigate } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 
 const SearchWrapper = styled.div`
   display: flex;
@@ -27,22 +27,27 @@ const SearchInput = styled.input`
 `
 
 export const NavSearch = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  // 홈페에지에서만 검색창이 보이게 조건 추가
-  const isHomePage = location.pathname === '/';
-  // 검색창을 클릭하면 검색페이지로 이동
+  const [query, setQuery] = useState("");
+
+  // 검색창 클릭 시 바로 검색 페이지로 이동
   const handleSearchClick = () => {
-    if(isHomePage){
-    navigate('/search'); 
-    }
+    console.log("검색 페이지로 이동");
+    navigate(`/search/results`);  // 클릭만으로 SearchPage로 이동
   };
 
   return (
-    isHomePage && (
-    <SearchWrapper onClick={handleSearchClick}>
-      <SearchInput type='text' placeholder='🔍  영화 이름을 검색해 보세요' />
-    </SearchWrapper>
-    )
-  )
-}
+    <div>
+      <SearchWrapper>
+        <SearchInput
+          type="text"
+          placeholder="🔍 영화 이름을 검색해 보세요"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)} // 입력값 업데이트
+          onClick={handleSearchClick} // 클릭하면 검색 페이지로 이동
+        />
+      </SearchWrapper>
+      <Outlet />
+    </div>
+  );
+};    
