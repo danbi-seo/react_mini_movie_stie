@@ -8,9 +8,34 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation'; 
 import 'swiper/css/pagination'; 
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import SkeletonCard from '../components/SkeletonCard'; 
 import { NavSearch } from '../components/NavSearch';
+import { SearchPage } from './SearchPage';
+
+
+//Link 로 만들어서 
+const SearchInput = styled.div`
+display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 0 10px;
+  position: relative;
+  height: 50px;
+  width: 100%;
+  font-size: 14px;
+  border: none;
+  border-radius: 7px;
+  outline: none;
+  margin-top: 14px;
+  background-color: #25304a;
+  color: #b7b7b7;
+  padding: 20px;
+  position: relative;
+  height: 40px;
+  z-index: 1;
+`
 
 const MainContainer = styled.div`
   display: flex;
@@ -51,7 +76,7 @@ const MovieListGrid = styled.div`
   margin: 0 auto;
   flex-grow: 1;
   margin-bottom: 60px
-`;
+`
 
 export function HomePage() {
   const [gridMovies, setGridMovies] = useState([]); // 하단 movies
@@ -108,7 +133,9 @@ export function HomePage() {
   return(
     <div className='flex flex-col w-full h-full'>
       <MainContainer>
-        <NavSearch />
+        <Link to={'/search'}>
+          <SearchInput>🔍 영화 이름을 검색해 보세요</SearchInput>
+        </Link>
         <SliderWrapper>
           <Swiper 
             modules={[Navigation, Pagination, Autoplay]} // 사용할 모듈 종류

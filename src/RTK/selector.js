@@ -8,8 +8,8 @@ export const selectMovieById = (movieId) => createSelector( // 바깥에서 쓸 
 
 //정규식으로 입력 받아온 값을 filter해서 가져올 수 있게
 export const selectMovieByRegExp = (reg) => createSelector(
-  state => state.Movie.data, // state에서 영화 데이터를 가져오기
-  (movies) => movies.filter(el => el.name.match(reg)) // (state.movie.data => movies)
+  (state) => state.Movie.data, // state에서 영화 데이터를 가져오기
+  (movies) => movies.filter(el => el.title.match(reg)) // 
 )
 
 //두개의 상태값을 꺼내왔기 때문에 인자값도 (pokemon, favorite) 두개로 넣어준다
