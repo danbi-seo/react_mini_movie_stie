@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import NavTop from './NavTop';
 import NavBottom from './NavBottom';
+import { useEffect } from 'react';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -29,6 +30,18 @@ const ContentWrapper = styled.div`
 const Layout = () => {
   const location = useLocation(); // 현재 URL 위치 정보 가져오기
   const isDetailPage = location.pathname.includes('/movie/');
+  const isMyPage = location.pathname === '/mypage';
+
+  useEffect(() => {
+    if(isMyPage) {
+      document.body.classList.add('mypage-background');
+    } else {
+      document.body.classList.remove('mypage-background');
+    }
+    return () => {
+      document.body.classList.remove('mypage-background');
+    }
+  }, [location.pathname, isMyPage])
   
   // framer-motion 으로 페이지마다 이동할때 애니메이션 
   const pageAnimate = {
@@ -42,7 +55,19 @@ const Layout = () => {
    * animate : 컴포넌트가 Initial상태에서 애니메이션이 될 최종 상태
    * exit : 컴포넌트가 화면에서 언마운트될 때 최종상태
    */ 
-
+  const myPageStyle = isMyPage ? {
+    width: '100vw', 
+    position: 'relative', 
+    left: '50%',
+    transform: 'translateX(-50%)',
+    height: '100vh',
+    minHeight: `calc(100vh - ${isDetailPage ? 0 : 50}px - 60px)` // NavTop(50px)과 NavBottom(60px) 높이 제외
+  } : {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center'
+  };
 
   return (
     <LayoutContainer>

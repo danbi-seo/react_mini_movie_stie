@@ -1,19 +1,24 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
-  background-color: #101322;
-  display: flex; 
-  width: 100%;
-  height: 100%; 
-  margin: 0; 
-  padding: 0;
-}
-
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  font-family: 'Pretendard'
 }
+
+html, body {
+  background-color: #101322;
+  height: 100%;
+  width: 100%;
+}
+
+// /mypage 경로일 때 body에 추가될 클래스에만 배경 이미지 적용
+body.mypage-background {
+  background-image: url('https://static.kinolights.com/bg/login-bg.png');
+  background-repeat: no-repeat;
+  background-color: transparent;
+  background-position: center;
+  background-size: cover; 
+  }
