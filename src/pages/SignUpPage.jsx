@@ -3,7 +3,61 @@ import styled from "styled-components"; // styled-components import 필요
 import { useNavigate } from "react-router-dom";
 import { useSupabaseAuth } from "../supabase";
 
-const LoginBox = styled.div``;
+const LoginBox = styled.div`
+  width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+`;
+
+const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+`;
+
+const Input = styled.input`
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+`;
+
+const LoginButton = styled.button`
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+`;
+
+const ErrorText = styled.p`
+  color: red;
+  font-size: 12px;
+  margin: 0;
+`;
 
 const SignUpPage = () => {
   const [userName, setUserName] = useState("");
@@ -41,7 +95,7 @@ const SignUpPage = () => {
 
     setLoading(true);
     try {
-      const result = await signUp(email, password, userName);
+      const result = await signUp({ email, password, userName });
       if (result.user) {
         navigate("/dashboard");
       } else {

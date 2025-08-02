@@ -24,6 +24,11 @@ export const useEmailAuth = () => {
         },
       });
 
+      if (error) {
+        console.error("Supabase signUp error:", error);
+        throw new Error(`Supabase Error: ${error.message}`);
+      }
+
       const userInfo = changeFromDto({
         type: !error ? DTO_TYPE.user : DTO_TYPE.error,
         dto: { user: data.user, error },

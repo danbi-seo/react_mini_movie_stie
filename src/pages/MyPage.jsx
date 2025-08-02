@@ -1,11 +1,9 @@
-import { FcGoogle } from "react-icons/fc";
-import { TbBrandKakoTalk } from "react-icons/tb";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useSupabaseAuth } from "../supabase";
+import { FcGoogle } from "react-icons/fc";
+import { TbBrandKakoTalk } from "react-icons/tb";
+import { useSupabaseAuth } from "../supabase/auth/index";
 
 const MyPageContainer = styled.div`
   width: 100vw;
@@ -165,23 +163,32 @@ const EasySignUp = styled.button`
   }
 `;
 
-export const MyPage = () => {
+export const MyPage = ({ onClose }) => {
   const navigate = useNavigate();
-  const [isLogIn, setIsLogIn] = useState(false);
-  const [userName, setUserName] = useState("사용자");
-  const [userEmail, setUserEmail] = useState("user@example.com");
+  const [user, setUser] = useState(null);
+  // const [isLogIn, setIsLogIn] = useState(false);
+  // const [userName, setUserName] = useState("사용자");
+  // const [userEmail, setUserEmail] = useState("user@example.com");
+
   // useSupabaseAuth에서 login과 logout 가져오기
   const { login, logout } = useSupabaseAuth();
+
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     const { user } = await getUserInfo();
+  //     if (user) {
+  //       navigate("/dashboard");
+  //     }
+  //   };
+  //   fetchUser();
+  // }, [getUserInfo, navigate]);
 
   const handleEmailLogin = async (email, password) => {
     try {
       //로그인 함수 호출
       const result = await login(email, password);
       if (result.user) {
-        setIsLogIn(true);
-        setUserName(result.user.user_namer || "사용자");
-        setUserEmail(result.user.email);
-        navigate("/"); //로그인 후 메인페이지로 이동
+        navigate("/"); // 로그인 후 메인페이지로 이동
       } else {
         alert("로그인에 실패했습니다. 다시 시도해주세요!");
       }
@@ -192,18 +199,15 @@ export const MyPage = () => {
 
   // 카카오로그인 처리
   const handleKakaoLogin = () => {
-    onClose();
     navigate("/kakao-login");
   };
 
   const handleGoogleLogin = () => {
-    onClose();
     navigate("/google-login");
   };
 
   const handleSignUpClick = (e) => {
     e.preventDefault(); // 기본 링크 동작 방지
-    onClose();
     navigate("/signup");
   };
 
@@ -211,14 +215,13 @@ export const MyPage = () => {
   // localStorage/sessionStorage에서 토큰 확인
   const handleLogout = async () => {
     try {
-      await logout(); //
-      setIsLogIn(false);
+      await logout();
+      setUser(null);
       navigate("/");
     } catch (error) {
       console.log("로그아웃 오류: ", error);
     }
   };
-  useEffect(() => {});
 
   const handleLoginClick = () => {
     navigate("/login");
@@ -234,14 +237,11 @@ export const MyPage = () => {
           맞춤 콘텐츠를 추천받아보세요!
         </WelcomeText>
         <LoginButton onClick={handleLoginClick}>이메일로 시작하기</LoginButton>
-        {/* <EmailLoginButton onClick={handleEmailLogin}>
+        <EmailLoginButton onClick={handleEmailLogin}>
           이메일로 시작하기
-        </EmailLoginButton> */}
+        </EmailLoginButton>
         <KakaoLoginButton onClick={handleKakaoLogin}>
-          <KakaoIcon
-            src="https://developers.kakao.com/assets/img/about/logos/kakaologin/kr/22_point_medium.png"
-            alt="카카오 아이콘"
-          />
+          <KakaoIcon />
           카카오로 시작하기
         </KakaoLoginButton>
         <GoogleLoginButton onClick={handleGoogleLogin}>
