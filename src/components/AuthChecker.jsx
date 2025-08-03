@@ -11,9 +11,9 @@ const AuthChecker = ({ children }) => {
     const checkAuthStatus = async () => {
       try {
         const { user } = await getUserInfo();
-        if (!user) {
-          // 로그인 정보가 없으면 마이페이지로 이동
-          navigate("/mypage");
+        console.log("user", user);
+        if (user) {
+          navigate("/dashboard");
         }
       } catch (error) {
         console.error("인증 상태 확인 오류:", error);
@@ -22,7 +22,6 @@ const AuthChecker = ({ children }) => {
         setLoading(false);
       }
     };
-
     checkAuthStatus();
   }, [getUserInfo, navigate]);
 

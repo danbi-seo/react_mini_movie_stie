@@ -10,7 +10,7 @@ const DashBoard = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       const { user } = await getUserInfo();
-      // 유저 정보가 없으면 MyPage로 보내는 로직을 제거했습니다.
+      console.log("user", user);
       if (user) {
         setUser(user);
       }
@@ -18,7 +18,7 @@ const DashBoard = () => {
     fetchUserInfo();
   }, [getUserInfo]);
 
-  const handleSignOut = async (e) => {
+  const handleLogOut = async (e) => {
     e.preventDefault();
     try {
       await logout(); // logout 호출하여 로그아웃 처리
@@ -38,7 +38,7 @@ const DashBoard = () => {
         <h2>사용자 정보를 불러오는 중입니다...</h2>
       )}
       <div>
-        <p onClick={handleSignOut}>로그아웃</p>
+        <button onClick={handleLogOut}>로그아웃</button>
       </div>
     </div>
   );

@@ -170,17 +170,21 @@ export const LoginPage = () => {
       setEmailError("");
     }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    // const passwordRegex =
+    //   /^(?=.[a-z])(?=.\d)(?=.[!@#$%^&()+])[a-z\d!@#$%^&*()+]{8,}$/i;
     if (password.length < 8) {
       setPasswordError("비밀번호는 8자 이상이어야 합니다.");
       isValid = false;
-    } else if (!passwordRegex.test(password)) {
-      // 8자는 넘지만 조합이 맞지 않는 경우
-      setPasswordError("비밀번호: 영어 대문자/소문자 + 숫자의 조합 사용");
-      isValid = false;
+      // } else if (!passwordRegex.test(password)) {
+      //   console.log("비밀번호", password);
+      //   // 8자는 넘지만 조합이 맞지 않는 경우
+      //   setPasswordError("비밀번호: 영어 소문자 + 숫자의 조합 사용");
+      //   isValid = false;
+      // }
     } else {
       // 모든 조건을 만족하는 경우
       setPasswordError("");
+      navigate("/");
     }
 
     if (isValid) {

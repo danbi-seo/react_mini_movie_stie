@@ -74,11 +74,12 @@ const LoginButton = styled.button`
   cursor: pointer;
   width: 100%;
   transition: background-color 0.2s ease;
-
-  &:hover {
+  ‰ &:hover {
     background-color: #3e6ecb;
   }
 `;
+
+const EmailLoginButton = styled.button``;
 
 const SignUpLink = styled.p`
   font-size: 0.9rem;
@@ -166,22 +167,10 @@ const EasySignUp = styled.button`
 export const MyPage = ({ onClose }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  // const [isLogIn, setIsLogIn] = useState(false);
-  // const [userName, setUserName] = useState("사용자");
-  // const [userEmail, setUserEmail] = useState("user@example.com");
+  const { loginWithKakao, loginWithGoogle } = useSupabaseAuth();
 
   // useSupabaseAuth에서 login과 logout 가져오기
   const { login, logout } = useSupabaseAuth();
-
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     const { user } = await getUserInfo();
-  //     if (user) {
-  //       navigate("/dashboard");
-  //     }
-  //   };
-  //   fetchUser();
-  // }, [getUserInfo, navigate]);
 
   const handleEmailLogin = async (email, password) => {
     try {
@@ -198,12 +187,21 @@ export const MyPage = ({ onClose }) => {
   };
 
   // 카카오로그인 처리
-  const handleKakaoLogin = () => {
-    navigate("/kakao-login");
+  const handleKakaoLogin = async () => {
+    console.log("MyPage: 카카오 로그인 함수 호출 시작");
+    try {
+      await loginWithKakao(`${window.location.origin}/kakao-login`);
+    } catch (error) {
+      console.error("카카오 로그인 오류", error);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    navigate("/google-login");
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      console.error("구글로 로그인 오류", error);
+    }
   };
 
   const handleSignUpClick = (e) => {
@@ -237,9 +235,9 @@ export const MyPage = ({ onClose }) => {
           맞춤 콘텐츠를 추천받아보세요!
         </WelcomeText>
         <LoginButton onClick={handleLoginClick}>이메일로 시작하기</LoginButton>
-        <EmailLoginButton onClick={handleEmailLogin}>
+        {/* <EmailLoginButton onClick={handleEmailLogin}>
           이메일로 시작하기
-        </EmailLoginButton>
+        </EmailLoginButton> */}
         <KakaoLoginButton onClick={handleKakaoLogin}>
           <KakaoIcon />
           카카오로 시작하기

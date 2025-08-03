@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
@@ -12,3 +11,5 @@ createRoot(document.getElementById("root")).render(
     </SupabaseProvider>
   </BrowserRouter>
 );
+
+// 로그인 버튼을 눌렀을때 신호가 안넘어가짐

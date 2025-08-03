@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Link, useLocation } from 'react-router-dom';
+import React from "react";
+import styled from "styled-components";
+import { Link, useLocation } from "react-router-dom";
 import { AiFillHome } from "react-icons/ai";
 import { AiFillTrophy } from "react-icons/ai";
 import { RiCompassFill } from "react-icons/ri";
@@ -25,7 +25,7 @@ const NavFooter = styled.div`
 // .withConfig(): 특정 컴포넌트를 렌더링하고 동작시키는 방식을 설정(configure)할 수 있게 해주는 특별한 메서드
 // shouldForwardProp: styled-components가 생성한 컴포넌트에 전달되는 모든 prop들을 검사하는 함수
 const NavItem = styled(Link).withConfig({
-  shouldForwardProp: (prop) => prop !== 'active' // 'active' prop을 DOM으로 전달하지 않음
+  shouldForwardProp: (prop) => prop !== "active", // 'active' prop을 DOM으로 전달하지 않음
 })`
   display: flex;
   max-width: 780px;
@@ -34,9 +34,9 @@ const NavItem = styled(Link).withConfig({
   justify-content: center;
   flex: 1;
   text-decoration: none;
-  color: ${props => props.active ? 'white' : '#efefef'};
+  color: ${(props) => (props.active ? "white" : "#efefef")};
   font-size: 0.75rem;
-  font-weight: ${props => props.active ? '700' : '400'};
+  font-weight: ${(props) => (props.active ? "700" : "400")};
   transition: color 0.2s ease-in-out;
   -webkit-tap-highlight-color: transparent;
 `;
@@ -51,43 +51,42 @@ const NavIcon = styled.div`
   /* 아이콘 색상도 NavItem의 color 속성을 따라가도록 별도로 지정하지 않습니다. */
 `;
 
-
 const NavBottom = () => {
   const location = useLocation();
   // 현재 경로가 각 버튼의 to 경로와 일치하는지 확인
   const isActive = (path) => location.pathname === path;
 
-  return( 
+  return (
     <NavFooter>
-      <NavItem to="/" active={isActive('/')}>
+      <NavItem to="/" active={isActive("/")}>
         <NavIcon>
-          <AiFillHome /> 
+          <AiFillHome />
         </NavIcon>
         홈
       </NavItem>
 
-      <NavItem to="/ranking" active={isActive('/ranking')}>
+      <NavItem to="/ranking" active={isActive("/ranking")}>
         <NavIcon>
-          <AiFillTrophy /> 
+          <AiFillTrophy />
         </NavIcon>
         랭킹
       </NavItem>
 
-      <NavItem to="/explore" active={isActive('/explore')}>
+      <NavItem to="/explore" active={isActive("/explore")}>
         <NavIcon>
-          <RiCompassFill /> 
+          <RiCompassFill />
         </NavIcon>
         탐색
       </NavItem>
 
-      <NavItem to="/mypage" active={isActive('/mypage')}>
+      <NavItem to="/dashboard" active={isActive("/dashboard")}>
         <NavIcon>
           <IoPersonSharp />
         </NavIcon>
         마이페이지
       </NavItem>
     </NavFooter>
-  )
-}
+  );
+};
 
 export default NavBottom;

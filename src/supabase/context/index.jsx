@@ -26,3 +26,5 @@ export const useSupabase = () => {
   }
   return supabase;
 };
+
+export const supabase = supabaseClient;
