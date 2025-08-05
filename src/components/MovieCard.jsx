@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const MovieCardContainer = styled.div`
   width: 160px;
-  height: 300px;
+  height: 320px;
   /* height: auto; */
   display: flex;
   flex-direction: column;
@@ -19,7 +19,6 @@ const MovieCardContainer = styled.div`
   overflow: hidden;
   cursor: pointer;
   margin: 10px;
-  /* flex-grow: 1; */
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
 `
 
@@ -42,6 +41,17 @@ const MovieInfo = styled.div`
   margin-top: 5px;
   flex-grow: 1;
 `
+
+const MovieTitle = styled.p`
+  font-weight: 700;
+  padding: 0 8px; /* 좌우 패딩 추가 */
+  /* 조건부 폰트 크기 조절 */
+  font-size: ${(props) => (props.$isLongTitle ? '11px' : '13px')}; 
+  line-height: 1.2; /* 줄간격 조절 */
+  white-space: normal; /* 자동 줄바꿈 허용 */
+  word-break: keep-all; /* 단어 단위로 줄바꿈 시도 */
+`;
+
 
 const MovieInfoBottom = styled.div`
   display: flex;
@@ -79,13 +89,17 @@ const MovieCard = ({ movie }) => {
 
   const PlusButtonActive = (e) => {
     e.stopPropagation(); // 상위요소에 클릭 이벤트가 발생하지 않게 함
+    e.preventDefault();
     setIsActive(prev => !prev);
   };
 
   const handleCardClick = (e) => {
     e.stopPropagation();
   }
-  console.log(movie);
+
+  const isLongTitle = movie?.title && movie.title.length > 13;
+
+
   if(!movie){
     return(<p className='text-[white]'>영화가 없어요</p>)
   }
@@ -97,7 +111,9 @@ const MovieCard = ({ movie }) => {
         <img className='h-[300px]'
         src={`${IMAGE_BASE_URL}${movie.poster_path}`}/>
         <MovieInfo>
-          <p className='font-[700]'>{movie.title}</p>
+          <MovieTitle $isLongTitle={isLongTitle}>
+            {movie.title}
+          </MovieTitle>
           <MovieInfoBottom>
             <span>⭐️ {movie.vote_average.toFixed(1)}</span>
             <PlusButton $active={isActive} onClick={PlusButtonActive}>+</PlusButton>
