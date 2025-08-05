@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { LoginModal } from "./LoginModal";
 import { UserMenuModal } from "./UserMenuModal";
 import { FaToggleOn, FaToggleOff } from "react-icons/fa6";
+import { localStorageUtils, USER_INFO_KEY } from "../supabase/utilities";
 
 const NavContainer = styled.nav`
   width: 100%;
@@ -41,11 +42,20 @@ const NavBrand = styled(Link)`
 `;
 
 const NavLogo = styled.img`
-  width: 30%;
+  width: 60%;
   height: auto;
 `;
+
+const UserProfileContainer = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  align-items: center;
+`;
+
 const StyledPersonIconWrapper = styled.div`
   display: flex;
+  position: relative; /* 모달 위치 설정을 위해 */
 `;
 
 const StyledPersonIcon = styled(IoPersonSharp)`
@@ -57,13 +67,29 @@ const StyledPersonIcon = styled(IoPersonSharp)`
   font-size: 1.5rem;
 `;
 
+const UserProfileImage = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+`;
+
+const UserName = styled.span`
+  display: flex;
+  justify-content: center;
+  margin-right: 20px;
+  margin-top: 10px;
+  font-size: 16px;
+  color: white;
+`;
+
 const DarkModeToggle = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 20px; /* 아이콘과 다크모드 토글 버튼 사이 간격 */
+  margin-left: 20px;
   cursor: pointer;
-  font-size: 1.8rem; /* 아이콘 크기 */
-  color: #a0a0a0; /* 기본 색상 */
+  font-size: 1.8rem;
+  color: #a0a0a0;
   transition: color 0.2s ease;
 
   &:hover {
@@ -76,15 +102,25 @@ const NavTop = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // 로그인 안 했을 때 모달
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // 로그인 했을 때 유저 메뉴 모달
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 (시뮬레이션)
+  const [userName, setUserName] = useState("");
+  const [userProfileImg, setUserProfileImg] = useState("");
   const iconRef = useRef(null); // 아이콘 DOM 요소 참조를 위한 ref
   const [isDarkMode, setIsDarkMode] = useState(false); // 다크모드 상태
 
   useEffect(() => {
-    const userToken = localStorage.getItem("userToken");
-    if (userToken) {
+    const userInfo = localStorageUtils().getItemFromLocalStorage(
+      USER_INFO_KEY.customKey
+    );
+    console.log("userInfo from localStorage:", userInfo);
+    //userInfo.id로 로그인 상태를 확인
+    if (userInfo && userInfo.id) {
       setIsLoggedIn(true);
+      setUserName(userInfo.user_metadata.name);
+      setUserProfileImg(userInfo.user_metadata?.profile_img || "");
     } else {
       setIsLoggedIn(false);
+      setUserName("");
+      setUserProfileImg("");
     }
 
     const savedDarkMode = localStorage.getItem("darkMode") === "true";
@@ -94,7 +130,7 @@ const NavTop = () => {
     } else {
       document.body.classList.remove("dark-mode");
     }
-  }, []); // <--- 이 부분에 다른 문자가 없는지 확인
+  }, []);
 
   // 다크 모드 상태 변경 시 localStorage 업데이트 및 body 클래스 토글
   useEffect(() => {
@@ -108,9 +144,10 @@ const NavTop = () => {
 
   const handleIconClick = () => {
     if (!isLoggedIn) {
-      setIsLoginModalOpen(true);
+      setIsLoginModalOpen(!isLoginModalOpen);
     } else {
-      navigate("/mypage");
+      // 로그인 상태일 때는 유저 메뉴 모달을 토글합니다.
+      setIsUserMenuOpen(!isUserMenuOpen);
     }
   };
 
@@ -118,26 +155,15 @@ const NavTop = () => {
     setIsLoginModalOpen(false);
   };
 
-  // 마우스 진입 시 유저 메뉴 열기
-  const handleMouseEnter = () => {
-    if (isLoggedIn) {
-      setIsUserMenuOpen(true);
-    }
-  };
-
-  // 마우스 이탈 시 유저 메뉴 닫기 (딜레이를 주어 부드럽게 닫히도록)
-  const handleMouseLeave = () => {
-    // 짧은 지연을 주어 사용자가 실수로 벗어나도 바로 닫히지 않게 함
-    setTimeout(() => {
-      setIsUserMenuOpen(false);
-    }, 200);
+  const handleUserMenuClose = () => {
+    setIsUserMenuOpen(false);
   };
 
   const handleLogout = () => {
-    // 로그아웃 로직
-    localStorage.removeItem("userToken");
+    // 로그아웃 로직 (로컬 스토리지 정보 제거)
+    localStorageUtils().removeItemFromLocalStorage(USER_INFO_KEY.customKey);
     setIsLoggedIn(false);
-    setIsUserMenuOpen(false);
+    handleUserMenuClose();
     navigate("/");
   };
 
@@ -151,28 +177,27 @@ const NavTop = () => {
         <NavBrand to="/">
           <NavLogo src={movie_logoW} alt="Movie Logo" />
         </NavBrand>
-        <StyledPersonIconWrapper
-          ref={iconRef} // ref 연결
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          onClick={handleIconClick}
-        >
-          <StyledPersonIcon />
-
-          {!isLoggedIn && isLoginModalOpen && (
-            <LoginModal onClose={handleLoginModalClose} />
-          )}
-          {isLoggedIn && isUserMenuOpen && (
-            <UserMenuModal
-              onClose={() => setIsUserMenuOpen(false)}
-              onLogout={handleLogout}
-            />
-          )}
-        </StyledPersonIconWrapper>
+        <UserProfileContainer>
+          {isLoggedIn && userName && <UserName>{userName} 님</UserName>}
+          <StyledPersonIconWrapper ref={iconRef} onClick={handleIconClick}>
+            {isLoggedIn && userProfileImg ? (
+              <UserProfileImage src={userProfileImg} alt="Profile" />
+            ) : (
+              <StyledPersonIcon />
+            )}
+          </StyledPersonIconWrapper>
+        </UserProfileContainer>
         <DarkModeToggle onClick={toggleDarkMode} className="mt-[6px]">
           {isDarkMode ? <FaToggleOn /> : <FaToggleOff />}
         </DarkModeToggle>
       </NavHeader>
+
+      {!isLoggedIn && isLoginModalOpen && (
+        <LoginModal onClose={handleLoginModalClose} />
+      )}
+      {isLoggedIn && isUserMenuOpen && (
+        <UserMenuModal onClose={handleUserMenuClose} onLogout={handleLogout} />
+      )}
     </NavContainer>
   );
 };

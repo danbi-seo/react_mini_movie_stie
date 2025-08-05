@@ -25,16 +25,16 @@ export const useAuth = () => {
   //   const getUserInfo = async () => {
   //     const localData = getItemFromLocalStorage(USER_INFO_KEY.sbKey);
 
-  //     // if (localData) {
-  //     //   const userInfo = changeFromDto({
-  //     //     type: localData.user ? DTO_TYPE.user : DTO_TYPE.error,
-  //     //     dto: localData,
-  //     //   });
-  //     //   if (userInfo.user) {
-  //     //     setItemToLocalStorage(USER_INFO_KEY.customKey, userInfo);
-  //     //   }
-  //     //   return userInfo;
-  //     // }
+  //     if (localData) {
+  //       const userInfo = changeFromDto({
+  //         type: localData.user ? DTO_TYPE.user : DTO_TYPE.error,
+  //         dto: localData,
+  //       });
+  //       if (userInfo.user) {
+  //         setItemToLocalStorage(USER_INFO_KEY.customKey, userInfo);
+  //       }
+  //       return userInfo;
+  //     }
 
   //     try {
   //       const { data, error } = await supabase.auth.getUser();
@@ -55,16 +55,26 @@ export const useAuth = () => {
   //       return null;
   //     }
   //   };
+  //   return {
+  //     getUserInfo,
+  //     logout,
+  //   };
   // };
 
-  async function getUserInfo() {
+  const getUserInfo = async () => {
     const {
-      data: { userInfo },
+      data: { user },
       error,
     } = await supabase.auth.getUser();
     if (error && error.message !== "Auth session missing!") {
       console.error("사용자 정보 조회 실패:", error.message);
     }
-    return userInfo;
-  }
+    console.log("user는?", user);
+    return user;
+  };
+
+  return {
+    getUserInfo,
+    logout,
+  };
 };

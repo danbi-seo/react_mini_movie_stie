@@ -1,5 +1,95 @@
 import React, { useState, useEffect } from "react";
-import { fetchMovies, genreIds } from "../API/tmdbapi";
+import styled from "styled-components";
+import MovieCard from "../components/MovieCard";
+import {
+  fetchPopularMovies,
+  fetchExploreMovies,
+  genreIds,
+} from "../API/tmdbapi";
+
+const ExploreContainer = styled.div`
+  background: #101322;
+  min-height: 100vh;
+  color: white;
+  padding: 16px 32px;
+`;
+
+const ContentWrapper = styled.div`
+  max-width: 1280px;
+  margin: 0 auto;
+`;
+
+const Title = styled.p`
+  display: flex;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 40px;
+`;
+
+const CategoryList = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #374151;
+  padding-bottom: 16px;
+  overflow-x: auto;
+  white-space: nowrap;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+`;
+
+const CategoryButton = styled.button`
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: all 0.2s;
+  font-size: 14px;
+  background-color: ${(props) => (props.$active ? "#275cd6" : "#1f2937")};
+  color: white;
+  font-weight: ${(props) => (props.$active ? "bold" : "normal")};
+  &:hover {
+    background-color: ${(props) => (props.$active ? "#275cd6" : "#374151")};
+  }
+`;
+
+const SortOptions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+`;
+
+const SortButton = styled.button`
+  font-size: 18px;
+  transition: all 0.2s;
+  color: ${(props) => (props.$active ? "#f59e0b" : "#9ca3af")};
+  font-weight: ${(props) => (props.$active ? "bold" : "normal")};
+  border-bottom: ${(props) => (props.$active ? "2px solid #f59e0b" : "none")};
+  &:hover {
+    color: white;
+  }
+`;
+
+const MovieGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  @media (min-width: 640px) {
+    gap: 24px;
+  }
+`;
+
+const Loader = styled.div`
+  text-align: center;
+  font-size: 18px;
+  color: #9ca3af;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+`;
+
+const NoMoviesMessage = styled(Loader)``;
 
 const categories = [
   "전체",
@@ -28,11 +118,11 @@ export const ExplorePage = () => {
       try {
         if (activeCategory === "전체") {
           // '전체' 카테고리는 인기순 영화를 가져옵니다.
-          moviesToDisplay = await fetchMovies();
+          moviesToDisplay = await fetchPopularMovies();
         } else {
           const genreId = genreIds[activeCategory];
           if (genreId) {
-            moviesToDisplay = await fetchDiscoverMovies({
+            moviesToDisplay = await fetchExploreMovies({
               genreId,
               sortBy: sortOrder,
             });
@@ -65,90 +155,49 @@ export const ExplorePage = () => {
   };
 
   return (
-    <div className="bg-[#101322] min-h-screen text-white p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-6">탐색</h1>
-
-        {/* 카테고리 섹션 */}
-        <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-700 pb-4">
+    <ExploreContainer>
+      <ContentWrapper>
+        <Title>영화 탐색</Title>
+        <CategoryList>
           {categories.map((category) => (
-            <button
+            <CategoryButton
               key={category}
               onClick={() => handleCategoryClick(category)}
-              className={`py-2 px-4 rounded-full transition-colors duration-200 
-                ${
-                  activeCategory === category
-                    ? "bg-yellow-500 text-black font-bold"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                }`}
+              $active={activeCategory === category}
             >
               {category}
-            </button>
+            </CategoryButton>
           ))}
-        </div>
+        </CategoryList>
 
-        {/* 정렬 버튼 섹션 */}
-        <div className="flex items-center gap-4 mb-8">
-          <button
+        <SortOptions>
+          <SortButton
             onClick={() => handleSortClick("primary_release_date.desc")}
-            className={`text-lg transition-colors duration-200 ${getSortButtonClass(
-              "releaseDate"
-            )}`}
+            $active={sortOrder === "primary_release_date.desc"}
           >
             개봉순
-          </button>
-          <button
+          </SortButton>
+          <SortButton
             onClick={() => handleSortClick("vote_average.desc")}
-            className={`text-lg transition-colors duration-200 ${getSortButtonClass(
-              "rating"
-            )}`}
+            $active={sortOrder === "vote_average.desc"}
           >
             별점순
-          </button>
-        </div>
+          </SortButton>
+        </SortOptions>
 
-        {/* 영화 목록 */}
         {isLoading ? (
-          <div className="text-center text-lg text-gray-400 animate-pulse">
-            영화 목록을 불러오는 중...
-          </div>
+          <Loader>영화 목록을 불러오는 중...</Loader>
         ) : filteredMovies.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+          <MovieGrid>
             {filteredMovies.map((movie) => (
-              <div key={movie.id} className="group cursor-pointer">
-                <div className="relative rounded-lg overflow-hidden transform transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl">
-                  <img
-                    src={movie.poster}
-                    alt={movie.title}
-                    className="w-full h-auto object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <h3 className="font-bold text-lg">{movie.title}</h3>
-                    <p className="text-sm text-gray-300">
-                      개봉: {movie.releaseDate}
-                    </p>
-                    <div className="flex items-center text-sm text-yellow-400 mt-1">
-                      <Star className="w-4 h-4 mr-1 fill-current" />
-                      <span>{movie.rating}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-2 text-center text-sm">
-                  <p className="font-semibold">{movie.title}</p>
-                  <p className="text-gray-400">
-                    {movie.releaseDate.substring(0, 4)}
-                  </p>
-                </div>
-              </div>
+              <MovieCard key={movie.id} movie={movie} />
             ))}
-          </div>
+          </MovieGrid>
         ) : (
-          <div className="text-center text-lg text-gray-400">
-            해당 카테고리에는 영화가 없습니다.
-          </div>
+          <NoMoviesMessage>해당 카테고리에는 영화가 없습니다.</NoMoviesMessage>
         )}
-      </div>
-    </div>
+      </ContentWrapper>
+    </ExploreContainer>
   );
 };
 

@@ -1,3 +1,6 @@
+import axios from "axios";
+
+// TMDB API 기본 설정
 const baseUrl = "https://api.themoviedb.org/3";
 const tmdbHeaders = {
   accept: "application/json",
@@ -27,98 +30,169 @@ export const genreIds = {
   서부: 37,
 };
 
-//카테고리별 영화 가져오기
-export async function fetchExploreMovies({ genreId, sortBy }) {
+// 카테고리별 영화 가져오기
+export const fetchExploreMovies = async ({ genreId, sortBy }) => {
   try {
-    const queryParams = new URLSearchParams();
-    if (genreId) {
-      queryParams.append("with_genres", genreId);
-    }
-    queryParams.append("sort_by", sortBy);
-    queryParams.append("language", "ko-KR");
-
-    const res = await fetch(
-      `${baseUrl}/discover/movie?${queryParams.toString()}`,
-      {
-        headers: tmdbHeaders,
-      }
-    );
-    if (!res.ok) throw new Error("탐색 영화 fetch 실패");
-    const data = await res.json();
-    return data.results || [];
+    const res = await axios.get(`${baseUrl}/discover/movie`, {
+      headers: tmdbHeaders,
+      params: {
+        with_genres: genreId,
+        sort_by: sortBy,
+        language: "ko-KR",
+      },
+    });
+    return res.data.results || [];
   } catch (error) {
-    console.error(error);
+    console.error("탐색 영화 fetch 실패:", error);
     return [];
   }
-}
+};
 
 // 인기 영화 가져오기
-export async function fetchMovies() {
+export const fetchPopularMovies = async () => {
   try {
-    const res = await fetch(`${baseUrl}/movie/popular?language=ko-KR`, {
+    const res = await axios.get(`${baseUrl}/movie/popular`, {
       headers: tmdbHeaders,
+      params: { language: "ko-KR" },
     });
-
-    if (!res.ok) throw new Error("영화 목록 fetch 실패");
-
-    const data = await res.json();
-    if (!data.results) throw new Error("영화 목록 데이터가 없습니다");
-
-    return data.results; // results 배열 반환
+    return res.data.results || [];
   } catch (error) {
-    console.error(error);
-    return []; // 오류 발생 시 빈 배열 반환
+    console.error("인기 영화 목록 fetch 실패:", error);
+    return [];
   }
-}
+};
 
-// 영화별 상세 가져오기
-export async function fetchMovieDetail(id) {
+// 평점높은 영화 가져오기
+export const fetchTopRatedMovies = async () => {
   try {
-    const res = await fetch(`${baseUrl}/movie/${id}?language=ko-KR`, {
+    const res = await axios.get(`${baseUrl}/movie/top_rated`, {
       headers: tmdbHeaders,
+      params: { language: "ko-KR" },
     });
-
-    if (!res.ok) throw new Error("영화 상세정보 fetch 실패");
-
-    return await res.json();
+    return res.data.results || [];
   } catch (error) {
-    console.error(error);
+    console.error("평점 높은 영화 fetch 실패:", error);
+    return [];
+  }
+};
+
+// 현재 상영 중인 영화 가져오기
+export const fetchNowPlayingMovies = async () => {
+  try {
+    const res = await axios.get(`${baseUrl}/movie/now_playing`, {
+      headers: tmdbHeaders,
+      params: { language: "ko-KR" },
+    });
+    return res.data.results || [];
+  } catch (error) {
+    console.error("현재 상영 중인 영화 fetch 실패:", error);
+    return [];
+  }
+};
+
+// 개봉 예정 영화 가져오기
+export const fetchUpcomingMovies = async () => {
+  try {
+    const res = await axios.get(`${baseUrl}/movie/upcoming`, {
+      headers: tmdbHeaders,
+      params: { language: "ko-KR" },
+    });
+    return res.data.results || [];
+  } catch (error) {
+    console.error("개봉 예정 영화 fetch 실패:", error);
+    return [];
+  }
+};
+
+// 영화 상세 정보 가져오기
+export const fetchMovieDetail = async (id) => {
+  try {
+    const res = await axios.get(`${baseUrl}/movie/${id}`, {
+      headers: tmdbHeaders,
+      params: { language: "ko-KR" },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("영화 상세 정보 fetch 실패:", error);
     return {};
   }
-}
+};
 
-// // 출연진/감독 정보
-// export async function fetchMovieCredits(id) {
-//   const res = await fetch(`${baseUrl}/movie/${id}/credits?language=ko-KR`, {
-//     headers: tmdbHeaders,
-//   });
+// 영화 출연진/제작진 정보 가져오기
+export const fetchMovieCredits = async (id) => {
+  try {
+    const res = await axios.get(`${baseUrl}/movie/${id}/credits`, {
+      headers: tmdbHeaders,
+      params: { language: "ko-KR" },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("영화 출연진/제작진 fetch 실패:", error);
+    return { cast: [], crew: [] };
+  }
+};
 
-//   if (!res.ok) throw new Error("출연진/감독 정보 fetch 실패");
-
-//   return await res.json(); //
-// }
-
-// // 예고편 / 영상 정보
-// export async function fetchMovieVideos(id) {
-//   const res = await fetch(`${baseUrl}/movie/${id}/videos?language=ko-KR`, {
-//     headers: tmdbHeaders,
-//   });
-
-//   if (!res.ok) throw new Error("예고편 영상 fetch 실패");
-
-//   return await res.json();
-// }
+// 예고편/영상 정보 가져오기
+export const fetchMovieVideos = async (id) => {
+  try {
+    const res = await axios.get(`${baseUrl}/movie/${id}/videos`, {
+      headers: tmdbHeaders,
+      params: { language: "ko-KR" },
+    });
+    return res.data.results || [];
+  } catch (error) {
+    console.error("예고편 영상 fetch 실패:", error);
+    return [];
+  }
+};
 
 // 검색 정보 가져오기
-export async function fetchSearchMovies(query) {
-  const res = await fetch(
-    `${baseUrl}/search/movie?query=${encodeURIComponent(query)}&language=ko-KR`,
-    {
+export const fetchSearchMovies = async (query) => {
+  try {
+    const res = await axios.get(`${baseUrl}/search/movie`, {
       headers: tmdbHeaders,
-    }
-  );
+      params: {
+        query: query,
+        language: "ko-KR",
+      },
+    });
+    return res.data.results || [];
+  } catch (error) {
+    console.error("검색 fetch 실패:", error);
+    return [];
+  }
+};
 
-  if (!res.ok) throw new Error("검색 fetch 실패");
+// 연령 등급 및 국가 기준으로 영화 가져오기
+export const fetchDiscoverMovies = async (sortMode, page) => {
+  try {
+    const res = await axios.get(`${baseUrl}/discover/movie`, {
+      headers: tmdbHeaders,
+      params: {
+        sort_by: sortMode,
+        "certification.lte": 19,
+        certification_country: "KR",
+        page: page,
+        language: "ko-KR",
+      },
+    });
+    return res.data.results || [];
+  } catch (error) {
+    console.error("Discover Movies fetch 실패:", error);
+    return [];
+  }
+};
 
-  return await res.json();
-}
+// 기간마다 트렌딩 영화를 가져오기
+export const fetchTrendingMovies = async (time_window) => {
+  try {
+    const res = await axios.get(`${baseUrl}/trending/movie/${time_window}`, {
+      headers: tmdbHeaders,
+      params: { language: "ko-KR" },
+    });
+    return res.data.results || [];
+  } catch (error) {
+    console.error("트렌딩 영화 fetch 실패:", error);
+    return [];
+  }
+};

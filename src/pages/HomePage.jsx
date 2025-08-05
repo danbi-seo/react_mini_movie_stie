@@ -66,32 +66,6 @@ const StyledSwiperSlide = styled(SwiperSlide)`
   align-items: center;
   height: 100%;
   width: 100%;
-  & img {
-    background: linear-gradient(
-        180deg,
-        rgba(16, 19, 34, 0) 60%,
-        rgba(16, 19, 34, 0.76) 80%,
-        #101322 100%
-      ),
-      linear-gradient(
-        0deg,
-        rgba(16, 19, 34, 0) 60%,
-        rgba(16, 19, 34, 0.76) 80%,
-        #101322 100%
-      ),
-      linear-gradient(
-        90deg,
-        rgba(16, 19, 34, 0) 60%,
-        rgba(16, 19, 34, 0.76) 80%,
-        #101322 100%
-      ),
-      linear-gradient(
-        270deg,
-        rgba(16, 19, 34, 0) 60%,
-        rgba(16, 19, 34, 0.76) 80%,
-        #101322 100%
-      );
-  }
 `;
 
 export function HomePage() {

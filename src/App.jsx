@@ -18,6 +18,7 @@ import { useEffect } from "react";
 import { localStorageUtils } from "./supabase/utilities/localStorage";
 import { supabaseClient } from "./supabase/context/index.jsx";
 import { ExplorePage } from "./pages/ExplorePage.jsx";
+import { RankingPage } from "./pages/RankingPage.jsx";
 
 const AuthRedirectHandler = () => {
   const { setItemToLocalStorage } = localStorageUtils();
@@ -66,6 +67,7 @@ function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/ranking" element={<RankingPage />} />
           <Route path="/signup" element={<SignUpPage />} />
 
           {/* AuthChecker로 먼저 로그인 상태 확인후 mypage(login) or dashboard 이동  */}

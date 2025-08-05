@@ -1,7 +1,7 @@
 import { useAuth } from "./useAuth";
 import { useEmailAuth } from "./useEmail.auth";
 import { useOAuth } from "./useOauth.auth";
-import { supabase } from "../context/index";
+import { supabase } from "../context/";
 
 export const useSupabaseAuth = () => {
   const { getUserInfo } = useAuth();

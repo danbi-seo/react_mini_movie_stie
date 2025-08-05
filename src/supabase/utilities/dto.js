@@ -1,5 +1,6 @@
 import { DTO_TYPE } from "./config";
 
+// 수파베이스에서 받아온 객체를 쓸내용을 가져와서 반환하는 것
 // User data 매핑용 함수
 export const changeFromDto = ({ type, dto }) => {
   switch (type) {

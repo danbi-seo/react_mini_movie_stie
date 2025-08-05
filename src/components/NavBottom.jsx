@@ -10,7 +10,7 @@ const NavFooter = styled.div`
   width: 100%;
   background-color: #101322;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   padding: 8px 0;
   position: fixed;
@@ -21,6 +21,12 @@ const NavFooter = styled.div`
   height: 60px;
 `;
 
+const NavItemContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 900px;
+`;
+
 // 각 네비게이션 아이템
 // .withConfig(): 특정 컴포넌트를 렌더링하고 동작시키는 방식을 설정(configure)할 수 있게 해주는 특별한 메서드
 // shouldForwardProp: styled-components가 생성한 컴포넌트에 전달되는 모든 prop들을 검사하는 함수
@@ -28,7 +34,7 @@ const NavItem = styled(Link).withConfig({
   shouldForwardProp: (prop) => prop !== "active", // 'active' prop을 DOM으로 전달하지 않음
 })`
   display: flex;
-  max-width: 780px;
+  width: 780px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -58,33 +64,35 @@ const NavBottom = () => {
 
   return (
     <NavFooter>
-      <NavItem to="/" active={isActive("/")}>
-        <NavIcon>
-          <AiFillHome />
-        </NavIcon>
-        홈
-      </NavItem>
+      <NavItemContainer>
+        <NavItem to="/" active={isActive("/")}>
+          <NavIcon>
+            <AiFillHome />
+          </NavIcon>
+          홈
+        </NavItem>
 
-      <NavItem to="/ranking" active={isActive("/ranking")}>
-        <NavIcon>
-          <AiFillTrophy />
-        </NavIcon>
-        랭킹
-      </NavItem>
+        <NavItem to="/ranking" active={isActive("/ranking")}>
+          <NavIcon>
+            <AiFillTrophy />
+          </NavIcon>
+          랭킹
+        </NavItem>
 
-      <NavItem to="/explore" active={isActive("/explore")}>
-        <NavIcon>
-          <RiCompassFill />
-        </NavIcon>
-        탐색
-      </NavItem>
+        <NavItem to="/explore" active={isActive("/explore")}>
+          <NavIcon>
+            <RiCompassFill />
+          </NavIcon>
+          탐색
+        </NavItem>
 
-      <NavItem to="/dashboard" active={isActive("/dashboard")}>
-        <NavIcon>
-          <IoPersonSharp />
-        </NavIcon>
-        마이페이지
-      </NavItem>
+        <NavItem to="/dashboard" active={isActive("/dashboard")}>
+          <NavIcon>
+            <IoPersonSharp />
+          </NavIcon>
+          마이페이지
+        </NavItem>
+      </NavItemContainer>
     </NavFooter>
   );
 };

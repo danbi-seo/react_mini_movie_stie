@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
+import { localStorageUtils } from "../supabase/utilities/localStorage";
+import { useEmailAuth } from "../supabase/auth/useEmail.auth";
 
 const LoginPageContainer = styled.div`
   width: 100vw;
@@ -156,11 +158,15 @@ export const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLoginSubmit = (e) => {
+  const { login } = useEmailAuth();
+
+  // 응답받아온 데이터를 처리(어디서 호출, 관리할까) / 로그인 정보 유지까지(어디다가 저장 - 로컬스토리지)
+  const handleLoginSubmit = async (e) => {
     e.preventDefault(); // 이벤트의 기본 동작을 중단시키는 메서드, 폼 제출 시 페이지가 새로고침되는 기본 동작을 막음
-    let isValid = true;
 
+    let isValid = true;
     const emailRegex =
       /^[a-zA-Z0-9가-힣]{2,8}@[a-zA-Z0-9가-힣]+\.[a-zA-Z가-힣]+$/;
     if (!emailRegex.test(email)) {
@@ -174,21 +180,23 @@ export const LoginPage = () => {
     //   /^(?=.[a-z])(?=.\d)(?=.[!@#$%^&()+])[a-z\d!@#$%^&*()+]{8,}$/i;
     if (password.length < 8) {
       setPasswordError("비밀번호는 8자 이상이어야 합니다.");
-      isValid = false;
-      // } else if (!passwordRegex.test(password)) {
-      //   console.log("비밀번호", password);
-      //   // 8자는 넘지만 조합이 맞지 않는 경우
-      //   setPasswordError("비밀번호: 영어 소문자 + 숫자의 조합 사용");
-      //   isValid = false;
-      // }
     } else {
-      // 모든 조건을 만족하는 경우
       setPasswordError("");
-      navigate("/");
     }
 
     if (isValid) {
-      console.log("로그인 시도:", { email, password });
+      setLoading(true);
+
+      //login 함수를 비동기로 호출
+      try {
+        const loginData = await login({ email, password });
+        console.log("로그인 성공", loginData);
+        navigate("/");
+      } catch {
+        console.error("로그인실패 : ", error.message);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -219,7 +227,7 @@ export const LoginPage = () => {
           <InputGroup>
             <Input
               type="email"
-              placeholder="이메일 주소 입력"
+              placeholder="이메일 주소를 입력 하세요"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -228,8 +236,8 @@ export const LoginPage = () => {
             />
             {emailError && <ErrorText>{emailError}</ErrorText>}
             <Input
-              type="text"
-              placeholder="8자 이상 입력 (문자/숫자/기호 사용 가능)"
+              type="password"
+              placeholder="8자 이상 입력 하세요"
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
@@ -240,10 +248,7 @@ export const LoginPage = () => {
           </InputGroup>
           <LoginButton type="submit">로그인</LoginButton>
         </form>
-        <StyledLink
-          href="#"
-          onClick={() => alert("비밀번호 재설정 (구현 예정)")}
-        >
+        <StyledLink href="#" onClick={() => alert("비밀번호 재설정 미구현")}>
           비밀번호 재설정
         </StyledLink>
       </LoginBox>
