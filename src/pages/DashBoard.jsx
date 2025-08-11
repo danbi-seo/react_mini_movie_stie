@@ -54,6 +54,7 @@ const StatItem = styled.div`
   background-color: #275cd6;
   padding: 20px 10px;
   border-radius: 8px;
+  cursor: pointer;
 `;
 
 const StatNumber = styled.p`
@@ -86,7 +87,7 @@ const ListItem = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 15px 0;
-
+  cursor: pointer;
   border-bottom: 1px solid #333;
   &:last-child {
     border-bottom: none;
@@ -97,25 +98,25 @@ const ListItemText = styled.p`
   font-size: 1rem;
 `;
 
-const LifeWorkSection = styled.div`
+const BestMoviesSection = styled.div`
   text-align: center;
   margin-top: 50px;
   padding-bottom: 50px;
 `;
 
-const LifeWorkTitle = styled.h3`
+const BestMoviesTitle = styled.h3`
   font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 20px;
 `;
 
-const LifeWorkDescription = styled.p`
+const BestMoviesContainer = styled.p`
   font-size: 0.9rem;
   color: #a0a0a0;
   margin-bottom: 20px;
 `;
 
-const AddLifeWorkButton = styled.button`
+const AddBestMoviesButton = styled.button`
   background-color: #275cd6;
   color: white;
   padding: 10px 20px;
@@ -140,6 +141,9 @@ const DashBoard = () => {
   const navigate = useNavigate();
   const { getUserInfo, logout } = useSupabaseAuth(); // signOut과 getUserInfo 훅 가져오기
   const [user, setUser] = useState(null);
+  const [wishCount, setWishCount] = useState(0);
+  const [watchingCount, setWatchingCount] = useState(0);
+  const [watchedCount, setWatchedCount] = useState(0);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -150,6 +154,57 @@ const DashBoard = () => {
       }
     };
     fetchUserInfo();
+  }, []);
+
+  // 로컬스토리지에서 좋아요와 별로예요 리스트 불러오기
+  useEffect(() => {
+    const likeMovies = JSON.parse(localStorage.getItem("likeMovies")) || [];
+    const dislikeMovies =
+      JSON.parse(localStorage.getItem("dislikeMovies")) || [];
+    // 좋아요 + 별로예요 누른 영화 합산하여 "봤어요" 개수로 설정
+    setWatchedCount(likeMovies.length + dislikeMovies.length);
+  }, []);
+
+  const handleLikeMovies = () => {
+    navigate("/likemovies");
+  };
+
+  const handleDisLikeMovies = () => {
+    navigate("/dislikemovies");
+  };
+
+  const handleWishList = () => {
+    navigate("/wishlist");
+  };
+  const handleWatching = () => {
+    navigate("/watching");
+  };
+  const handleWatched = () => {
+    navigate("/watched");
+  };
+  const handlebestMovies = () => {
+    navigate("/bestmovies");
+  };
+
+  const moviesCounts = () => {
+    const wl = JSON.parse(localStorage.getItem("wishList") || "[]");
+    const wcl = JSON.parse(localStorage.getItem("watchingList") || "[]");
+    const wd = JSON.parse(localStorage.getItem("watchedList") || "[]");
+    setWishCount(wl.length);
+    setWatchingCount(wcl.length);
+    setWatchedCount(wd.length);
+  };
+
+  useEffect(() => {
+    moviesCounts();
+    // 다른 탭에서 변경 시 동기화
+    const onStorage = (e) => {
+      if (["wishList", "watchingList"].includes(e.key)) {
+        refreshCounts();
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   const handleLogOut = async (e) => {
@@ -174,45 +229,36 @@ const DashBoard = () => {
       </ProfileHeader>
 
       <StatGrid>
-        <StatItem>
-          <StatNumber>0</StatNumber>
+        <StatItem onClick={handleWishList}>
+          <StatNumber>{wishCount}</StatNumber>
           <StatLabel>찜했어요</StatLabel>
         </StatItem>
-        <StatItem>
-          <StatNumber>0</StatNumber>
+        <StatItem onClick={handleWatching}>
+          <StatNumber>{watchingCount}</StatNumber>
           <StatLabel>보는 중</StatLabel>
         </StatItem>
-        <StatItem>
-          <StatNumber>0</StatNumber>
+        <StatItem onClick={handleWatched}>
+          <StatNumber>{watchedCount}</StatNumber>
           <StatLabel>봤어요</StatLabel>
         </StatItem>
       </StatGrid>
 
-      {/* <SectionHeader>
-        본 작품 캘린더
-        <IoIosArrowForward />
-      </SectionHeader>
-      <SectionHeader>
-        본 작품 통계
-        <IoIosArrowForward />
-      </SectionHeader> */}
-
       <ListContainer>
-        <ListItem>
+        <ListItem onClick={handleLikeMovies}>
           <ListItemText>💙 좋아요 누른 작품</ListItemText>
           <IoIosArrowForward />
         </ListItem>
-        <ListItem>
+        <ListItem onClick={handleDisLikeMovies}>
           <ListItemText>💔 별로예요 누른 작품</ListItemText>
           <IoIosArrowForward />
         </ListItem>
       </ListContainer>
 
-      <LifeWorkSection>
-        <LifeWorkTitle>인생작품</LifeWorkTitle>
-        <LifeWorkDescription>등록한 인생작품이 없어요</LifeWorkDescription>
-        <AddLifeWorkButton>인생작품 등록하기</AddLifeWorkButton>
-      </LifeWorkSection>
+      <BestMoviesSection>
+        <BestMoviesTitle>인생작품</BestMoviesTitle>
+        <BestMoviesContainer>등록한 인생작품이 없어요</BestMoviesContainer>
+        <AddBestMoviesButton>인생작품 등록하기</AddBestMoviesButton>
+      </BestMoviesSection>
     </DashBoardContainer>
   );
 };

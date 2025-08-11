@@ -62,7 +62,7 @@ export const fetchPopularMovies = async () => {
   }
 };
 
-// 평점높은 영화 가져오기
+// 평점 높은 영화 가져오기
 export const fetchTopRatedMovies = async () => {
   try {
     const res = await axios.get(`${baseUrl}/movie/top_rated`, {
@@ -170,7 +170,8 @@ export const fetchDiscoverMovies = async (sortMode, page) => {
       headers: tmdbHeaders,
       params: {
         sort_by: sortMode,
-        "certification.lte": 19,
+        "certification.lte": "18",
+        include_adult: false,
         certification_country: "KR",
         page: page,
         language: "ko-KR",

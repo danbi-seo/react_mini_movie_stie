@@ -1,6 +1,4 @@
-import "./App.css";
 import { Provider } from "react-redux";
-import { store } from "./RTK/store";
 import MovieDetail from "./components/MovieDetail";
 import movieDetailData from "./assets/data/movieDetailData.json";
 import { Route, Routes, useNavigate } from "react-router-dom";
@@ -19,6 +17,12 @@ import { localStorageUtils } from "./supabase/utilities/localStorage";
 import { supabaseClient } from "./supabase/context/index.jsx";
 import { ExplorePage } from "./pages/ExplorePage.jsx";
 import { RankingPage } from "./pages/RankingPage.jsx";
+import { LikeMovies } from "./pages/LikeMovies.jsx";
+import { DisLikeMovies } from "./pages/DislikeMovies.jsx";
+import { WishList } from "./pages/WishList.jsx";
+import { Watching } from "./pages/Watching.jsx";
+import { BestMovies } from "./pages/BestMovies.jsx";
+import { Watched } from "./pages/Watched.jsx";
 
 const AuthRedirectHandler = () => {
   const { setItemToLocalStorage } = localStorageUtils();
@@ -51,38 +55,42 @@ const AuthRedirectHandler = () => {
 
 function App() {
   return (
-    <Provider store={store}>
-      <Routes>
-        {/* 카카오 로그인 리다이렉트 */}
-        <Route path="/kakao-login" element={<AuthRedirectHandler />} />
-        {/* 구글 로그인 리다이렉트 */}
-        <Route path="/google-login" element={<AuthRedirectHandler />} />
+    <Routes>
+      {/* 카카오 로그인 리다이렉트 */}
+      <Route path="/kakao-login" element={<AuthRedirectHandler />} />
+      {/* 구글 로그인 리다이렉트 */}
+      <Route path="/google-login" element={<AuthRedirectHandler />} />
 
-        <Route path="/" element={<Layout />}>
-          <Route index element={<HomePage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route
-            path="/movie/:id"
-            element={<MovieDetail movie={movieDetailData} />}
-          />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/ranking" element={<RankingPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route
+          path="/movie/:id"
+          element={<MovieDetail movie={movieDetailData} />}
+        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/ranking" element={<RankingPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
 
-          {/* AuthChecker로 먼저 로그인 상태 확인후 mypage(login) or dashboard 이동  */}
-          <Route
-            path="/dashboard"
-            element={
-              <AuthChecker>
-                <DashBoard />
-              </AuthChecker>
-            }
-          />
-          <Route path="/mypage" element={<MyPage />} />
-        </Route>
-      </Routes>
-    </Provider>
+        {/* AuthChecker로 먼저 로그인 상태 확인후 mypage(login) or dashboard 이동  */}
+        <Route
+          path="/dashboard"
+          element={
+            <AuthChecker>
+              <DashBoard />
+            </AuthChecker>
+          }
+        />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/likemovies" element={<LikeMovies />} />
+        <Route path="/dislikemovies" element={<DisLikeMovies />} />
+        <Route path="/wishlist" element={<WishList />} />
+        <Route path="/watching" element={<Watching />} />
+        <Route path="/watched" element={<Watched />} />
+        {/* <Route path="/bestmovies" element={<BestMovies />} /> */}
+      </Route>
+    </Routes>
   );
 }
 

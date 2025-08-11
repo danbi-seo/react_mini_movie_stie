@@ -8,8 +8,6 @@ const RankingContainer = styled.div`
   width: 90%;
   padding: 0;
   color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 `;
 
 // 상단 필터바
@@ -200,7 +198,6 @@ export const RankingPage = () => {
               <MovieTitle>{movie.title}</MovieTitle>
               <MovieSubInfo>
                 {movie.release_date && movie.release_date.substring(0, 4)}
-                {movie.genre_ids.length > 0 && ` | ${movie.genre_ids[0]}`}
               </MovieSubInfo>
             </MovieInfo>
             <MovieRating>

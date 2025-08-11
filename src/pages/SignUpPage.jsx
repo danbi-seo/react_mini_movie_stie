@@ -1,62 +1,138 @@
 import React, { useState } from "react";
 import styled from "styled-components"; // styled-components import 필요
 import { useNavigate } from "react-router-dom";
+import { IoIosArrowBack } from "react-icons/io";
 import { useSupabaseAuth } from "../supabase";
 
+const LoginPageContainer = styled.div`
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #101322;
+  color: #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+`;
+
+const Header = styled.div`
+  width: 100%;
+  max-width: 780px;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #101322;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  padding: 0 15px;
+  box-sizing: border-box;
+  z-index: 100;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const BackButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  &:hover {
+    opacity: 0.7;
+  }
+`;
+
+const HeaderTitle = styled.h2`
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  background-color: #101322;
+`;
+
 const LoginBox = styled.div`
-  width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
+  background-color: transparent;
+  border-radius: 12px;
+  padding: 30px 20px;
+  max-width: 400px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  z-index: 1;
+  box-sizing: border-box;
+  margin-top: 80px;
 `;
 
 const InputGroup = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 12px;
 `;
 
 const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
   width: 100%;
-  box-sizing: border-box;
+  padding: 15px;
+  border: 1px solid #3b4869;
+  border-radius: 8px;
+  background-color: #172036;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+
+  &::placeholder {
+    color: #888;
+  }
 
   &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-`;
-
-const LoginButton = styled.button`
-  padding: 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-
-  &:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+    border-color: #275cd6;
   }
 `;
 
 const ErrorText = styled.p`
-  color: red;
-  font-size: 12px;
-  margin: 0;
+  color: #d43030;
+  font-size: 15px;
+  margin: 3px 5px;
+  text-align: left;
+  width: 100%;
+`;
+
+const LoginButton = styled.button`
+  width: 100%;
+  padding: 15px;
+  background-color: #275cd6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 50px;
+
+  &:hover {
+    background-color: #3e6ecb;
+  }
+`;
+
+const StyledLink = styled.a`
+  color: #a0a0a0;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-top: 15px;
+
+  &:hover {
+    text-decoration: underline;
+    color: #fff;
+  }
 `;
 
 const SignUpPage = () => {
@@ -109,7 +185,13 @@ const SignUpPage = () => {
   };
 
   return (
-    <div>
+    <LoginPageContainer>
+      <Header>
+        <BackButton onClick={() => navigate(-1)}>
+          <IoIosArrowBack />
+        </BackButton>
+        <HeaderTitle>회원가입</HeaderTitle>
+      </Header>
       <LoginBox>
         <form
           onSubmit={handleSignUp}
@@ -171,7 +253,7 @@ const SignUpPage = () => {
           {error && <ErrorText>{error}</ErrorText>}
         </form>
       </LoginBox>
-    </div>
+    </LoginPageContainer>
   );
 };
 

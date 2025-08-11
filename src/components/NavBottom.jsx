@@ -54,7 +54,6 @@ const NavIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 아이콘 색상도 NavItem의 color 속성을 따라가도록 별도로 지정하지 않습니다. */
 `;
 
 const NavBottom = () => {

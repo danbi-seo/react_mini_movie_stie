@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
 import MovieCard from "../components/MovieCard";
 import { useEffect, useState, useCallback } from "react";
@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import SkeletonCard from "../components/SkeletonCard";
 import { NavSearch } from "../components/NavSearch";
 import { SearchPage } from "./SearchPage";
+import { fetchDiscoverMovies } from "../API/tmdbapi";
 
 const MovieListGrid = styled.div`
   display: grid;
@@ -55,6 +56,7 @@ const SliderWrapper = styled.div`
   position: relative;
   overflow: hidden;
   min-height: 500px;
+  margin-top: -20px;
   .swiper {
     width: 100%;
     height: 100%;
@@ -67,63 +69,66 @@ const StyledSwiperSlide = styled(SwiperSlide)`
   height: 100%;
   width: 100%;
 `;
+/* ================================================================= */
 
 export function HomePage() {
   const [gridMovies, setGridMovies] = useState([]); // 하단 movies
   const [swiperMovies, setSwiperMovies] = useState([]); // 상단 movies
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1); // 페이지 상태
+  const [hasMore, setHasMore] = useState(true); // 더 불러올 데이터 있는지
+
   const navigate = useNavigate();
+  const observer = useRef(); // IntersectionObserver 위한 ref
+  const lastMovieElementRef = useRef(null);
 
-  const TMDB_API_TOKEN = import.meta.env.VITE_TMDB_TOKEN;
+  // const TMDB_API_TOKEN = import.meta.env.VITE_TMDB_TOKEN;
 
-  //useEffect를 사용하면 fetchMovies같은 데이터를 가져올때 불필요하게 여러번 실행되는 것을 방지
-  const fetchMovies = useCallback(async () => {
+  // 영화 데이터 가져오기
+  const fetchMovies = useCallback(async (pageNum) => {
+    setLoading(true);
     try {
-      const response = await fetch(
-        "https://api.themoviedb.org/3/movie/popular?language=ko",
-        {
-          headers: {
-            Authorization: `Bearer ${TMDB_API_TOKEN}`,
-            accept: "application/json;charset=utf-8",
-          },
-        }
-      );
+      const newMovies = await fetchDiscoverMovies("popularity.desc", pageNum);
 
-      const data = await response.json();
-      console.log("API 응답 데이터:", data);
+      if (pageNum === 1) {
+        // 첫 페이지일 때만 데이터를 설정
+        setGridMovies(newMovies);
+        setSwiperMovies(newMovies.slice(0, 5));
+      } else {
+        // 다음 페이지: 그리드에만 추가
+        setGridMovies((prevMovies) => [...prevMovies, ...newMovies]);
+      }
 
-      // 상단 슬라이드에 보일 영화를 성인영화를 제외 필터링
-      const allMovies = data.results.filter((movie) => movie.adult === false);
-
-      // 평점 기준으로 내림차순 정렬
-      const sortedMovies = [...allMovies].sort(
-        (a, b) => b.vote_average - a.vote_average
-      );
-
-      // 상단 슬라이드 영화카드용 (상위 10개)
-      const top5Movies = sortedMovies.slice(0, 5);
-      setSwiperMovies(top5Movies); // swiperMovies 상태에 저장
-
-      // 하단 영화카드용 (성인 영화 제외)
-      const filteredGridMovie = data.results.filter(
-        (movie) => movie.adult === false
-      );
-      setGridMovies(filteredGridMovie); // gridMovies 상태에 저장
-      setLoading(false);
-      console.log("Top 10 Movies for Swiper:", top5Movies);
+      setHasMore(newMovies.length > 0);
     } catch (err) {
       console.error("영화 데이터를 가져오는 중 오류 발생:", err);
-      setLoading(false);
     } finally {
       setLoading(false);
     }
-    // useEffect 에서 fetchMovies를 의존성배열에 넣은 이유는 fetchMovies 함수가 useEffect내부에 실행도리때마다 최신상태의 fetchMovies를 호출하기 위해서
-  }, [TMDB_API_TOKEN, setSwiperMovies, setGridMovies, setLoading]);
+  }, []);
 
   // useEffect를 사용하여 안정화된 fetchMovies 함수를 컴포넌트 마운트 시 한 번 호출.
   useEffect(() => {
-    fetchMovies();
-  }, [fetchMovies]); // useEffect는 이제 안정화된 fetchMovies 함수만 들어옴 (이때 경고 사라짐) */
+    fetchMovies(page);
+  }, [page, fetchMovies]); // useEffect는 이제 안정화된 fetchMovies 함수만 들어옴 (이때 경고 사라짐) */
+
+  // 마지막 영화 요소가 화면에 보이면 다음 페이지를 불러오는 IntersectionObserver
+  useEffect(() => {
+    if (loading || !hasMore) return;
+    const currentElement = lastMovieElementRef.current;
+    if (!currentElement) return;
+
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setPage((prevPage) => prevPage + 1); // 페이지를 증가시켜 새로운 데이터를 로드
+      }
+    });
+    observer.current.observe(currentElement);
+
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [loading, hasMore]);
 
   const handleMovieClick = (movieId) => {
     navigate(`/movie/${movieId}`);
@@ -165,15 +170,32 @@ export function HomePage() {
         </SliderWrapper>
 
         <MovieListGrid>
-          {loading
-            ? [...Array(10)].map((_, index) => <SkeletonCard key={index} />)
-            : gridMovies.map((movie) => (
+          {gridMovies.map((movie, index) => {
+            // 마지막 영화에만 ref를 연결하고 스크롤 감지
+            if (gridMovies.length === index + 1) {
+              return (
                 <MovieCard
+                  ref={lastMovieElementRef}
                   key={movie.id}
                   movie={movie}
                   onClick={() => handleMovieClick(movie.id)}
                 />
-              ))}
+              );
+            }
+            return (
+              <MovieCard
+                key={movie.id}
+                movie={movie}
+                onClick={() => handleMovieClick(movie.id)}
+              />
+            );
+          })}
+          {loading &&
+            hasMore &&
+            // 로딩 중일 때 추가 스켈레톤 카드
+            [...Array(10)].map((_, index) => (
+              <SkeletonCard key={`skeleton-${index}`} />
+            ))}
         </MovieListGrid>
       </MainContainer>
     </div>

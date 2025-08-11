@@ -1,8 +1,8 @@
-import React from 'react';
-import styled from 'styled-components';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/scrollbar';
+import React from "react";
+import styled from "styled-components";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
 
 const SwiperSlideImageContainer = styled.div`
   width: 100%;
@@ -11,6 +11,7 @@ const SwiperSlideImageContainer = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
+
   img {
     width: 100%;
     height: 100%;
@@ -20,24 +21,45 @@ const SwiperSlideImageContainer = styled.div`
   }
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(16, 19, 34, 0) 60%,
+        rgba(16, 19, 34, 0.76) 80%,
+        #101322 100%
+      ),
+      linear-gradient(
+        0deg,
+        rgba(16, 19, 34, 0) 60%,
+        rgba(16, 19, 34, 0.76) 80%,
+        #101322 100%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(16, 19, 34, 0) 60%,
+        rgba(16, 19, 34, 0.76) 80%,
+        #101322 100%
+      ),
+      linear-gradient(
+        270deg,
+        rgba(16, 19, 34, 0) 60%,
+        rgba(16, 19, 34, 0.76) 80%,
+        #101322 100%
+      );
     pointer-events: none; /* 오버레이가 클릭을 방해하지 않도록 */
   }
 `;
 
-
-const IMG_BASE_URL = "https://image.tmdb.org/t/p/w780"; 
+const IMG_BASE_URL = "https://image.tmdb.org/t/p/w780";
 
 function SwiperMovieCard({ movie }) {
-
   return (
-    <div className=''>
+    <div className="">
       <SwiperSlideImageContainer>
         <img src={`${IMG_BASE_URL}${movie.backdrop_path}`} />
       </SwiperSlideImageContainer>
@@ -46,4 +68,3 @@ function SwiperMovieCard({ movie }) {
 }
 
 export default SwiperMovieCard;
-
