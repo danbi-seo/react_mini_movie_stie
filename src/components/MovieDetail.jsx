@@ -336,7 +336,10 @@ const MovieDetail = () => {
   const [wishList, setWishList] = useState([]);
   const [watchingList, setWatchingList] = useState([]);
   const [watchedList, setWatchedList] = useState([]);
-  const [bestMovies, setBestMovies] = useState([]);
+  const [bestMovies, setBestMovies] = useState(
+    () => JSON.parse(localStorage.getItem("bestMovies")) || []
+  );
+  const [bestReady, setBestReady] = useState(false);
 
   // 버튼 클릭 상태 관리
   const [wishListActive, setWishListActive] = useState(false);
@@ -378,6 +381,7 @@ const MovieDetail = () => {
         setWatchingList(savedWatchingList);
         setWatchedList(savedWatchedList);
         setBestMovies(savedBestMovies);
+        setBestReady(true);
 
         setWishListActive(
           savedWishList.some((movie) => movie.id === movieDetail.id)
@@ -389,7 +393,9 @@ const MovieDetail = () => {
           savedWatchedList.some((movie) => movie.id === movieDetail.id)
         );
         setBestMoviesActive(
-          savedBestMovies.some((movie) => movie.id === movieDetail.id)
+          (JSON.parse(localStorage.getItem("bestMovies")) || []).some(
+            (movie) => movie.id === movieDetail.id
+          )
         );
       } catch (error) {
         console.error("영화 정보 가져오기 오류:", error);
@@ -404,9 +410,12 @@ const MovieDetail = () => {
     // movieData와 버튼 상태가 초기화된 후, 상태값을 로컬스토리지에 저장
     localStorage.setItem("likeMovies", JSON.stringify(likeMovies));
     localStorage.setItem("dislikeMovies", JSON.stringify(disLikeMovies));
-
     // 다른 리스트들은 로컬스토리지에 저장하지 않음
-  }, [likeMovies, disLikeMovies, movieData]);
+  }, [likeMovies, disLikeMovies]);
+
+  useEffect(() => {
+    localStorage.setItem("bestMovies", JSON.stringify(bestMovies));
+  }, [bestMovies]);
 
   const backdropUrl = movieData?.backdrop_path
     ? `${IMAGE_BASE_URL}${BACKDROP_SIZE}${movieData.backdrop_path}`
@@ -549,7 +558,7 @@ const MovieDetail = () => {
             <IconBox $active={bestMoviesActive}>
               <RiMovieAiFill />
             </IconBox>
-            인생작품
+            인생영화
           </IconItem>
         </IconItemContainer>
 

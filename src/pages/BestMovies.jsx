@@ -111,12 +111,12 @@ export const BestMovies = () => {
     <LikeMoviesContainer>
       <Header>
         <BackButton onClick={() => window.history.back()}>&lt;</BackButton>
-        <Title>💙 좋아요 영화 리스트</Title>
+        <Title>💘 인생 영화 리스트</Title>
       </Header>
 
       {bestMovies.length === 0 ? (
         <p className="flex flex-center mt-[30px] ml-[270px] text-[18px]">
-          💙 좋아요 누른 작품이 아직 없네요!
+          💘 인생 영화가 아직 없네요!
         </p>
       ) : (
         <MovieList>

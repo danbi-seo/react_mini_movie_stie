@@ -88,7 +88,7 @@ function App() {
         <Route path="/wishlist" element={<WishList />} />
         <Route path="/watching" element={<Watching />} />
         <Route path="/watched" element={<Watched />} />
-        {/* <Route path="/bestmovies" element={<BestMovies />} /> */}
+        <Route path="/bestmovies" element={<BestMovies />} />
       </Route>
     </Routes>
   );

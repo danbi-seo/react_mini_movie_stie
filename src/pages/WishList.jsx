@@ -115,7 +115,7 @@ export const WishList = () => {
       </Header>
 
       {wishList.length === 0 ? (
-        <p className="flex flex-center mt-[30px] ml-[270px] text-[18px]">
+        <p className="flex flex-center mt-[30px] justify-center text-[18px]">
           📍 찜하기 누른 작품이 아직 없네요!
         </p>
       ) : (

@@ -78,33 +78,40 @@ const DeleteButton = styled.button`
 `;
 
 export const Watched = () => {
-  const [watched, setWatched] = useState([]);
+  // 상태 변수 이름을 'watchedMovies'와 같이 명확하게 수정
+  const [watchedMovies, setWatchedMovies] = useState([]);
 
   // 로컬스토리지에서 좋아요 누른 영화 데이터를 가져오는 함수
   useEffect(() => {
-    const storedWatched = JSON.parse(localStorage.getItem("WatchedList"));
-    if (storedWatched) {
-      //index === storedWatched.findIndex(...) 으로 중복된 항목은 제외하기
-      const uniqueMovies = storedWatched.filter(
-        (movie, index) =>
-          index === storedWatched.findIndex((m) => m.id === movie.id)
-      );
-      // 중복없이 걸러진 영화를 다시 내리차순으로 정렬하기
-      const sortedMovies = uniqueMovies.sort(
-        (a, b) => b.timestamp - a.timestamp
-      );
-      setWatched(uniqueMovies);
+    try {
+      const storedWatchedList = JSON.parse(localStorage.getItem("WatchedList"));
+      if (storedWatchedList) {
+        // 중복된 항목은 제외하고, timestamp 내림차순으로 정렬
+        const uniqueAndSortedMovies = storedWatchedList
+          .filter(
+            (movie, index, self) =>
+              index === self.findIndex((m) => m.id === movie.id)
+          )
+          .sort((a, b) => b.timestamp - a.timestamp);
+
+        setWatchedMovies(uniqueAndSortedMovies);
+      }
+    } catch (e) {
+      console.error("로컬 스토리지 데이터 파싱 오류:", e);
+      setWatchedMovies([]);
     }
-  }, []);
+  }, []); // 의존성 배열을 비워 컴포넌트가 마운트될 때 한 번만 실행되도록 함
 
   // 영화 리스트에서 삭제하기
   const handleDelete = (movieId) => {
-    // 해당 영화하는 영화만 고르기
-    const updateMovies = WatchedList.filter((movie) => movie.id !== movieId);
-    //로컬스토리지에 업데이트된 영화 목록으로 저장하기
-    localStorage.setItem("WatchedList", JSON.stringify(updateMovies));
+    // 현재 상태(watchedMovies)를 사용하여 삭제
+    const updatedMovies = watchedMovies.filter((movie) => movie.id !== movieId);
+
+    // 로컬스토리지에 업데이트된 영화 목록으로 저장
+    localStorage.setItem("WatchedList", JSON.stringify(updatedMovies));
+
     // 상태를 업데이트
-    setWatched(updateMovies);
+    setWatchedMovies(updatedMovies);
   };
 
   return (
@@ -114,13 +121,13 @@ export const Watched = () => {
         <Title>☑️ 다 본 영화 리스트</Title>
       </Header>
 
-      {Watched.length === 0 ? (
+      {watchedMovies.length === 0 ? (
         <p className="flex flex-center mt-[30px] ml-[270px] text-[18px]">
           ☑️ 다 본 작품이 아직 없네요!
         </p>
       ) : (
         <MovieList>
-          {Watched.map((movie) => (
+          {watchedMovies.map((movie) => (
             <MovieItem key={movie.id}>
               <Poster
                 src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}

@@ -115,7 +115,7 @@ export const Watching = () => {
       </Header>
 
       {watching.length === 0 ? (
-        <p className="flex flex-center mt-[30px] ml-[270px] text-[18px]">
+        <p className="flex flex-center mt-[30px] justify-center text-[18px]">
           👀 보는중인 작품이 아직 없네요!
         </p>
       ) : (

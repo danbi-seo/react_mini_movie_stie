@@ -164,10 +164,7 @@ const CloseText = styled.button`
 export const LoginModal = ({ onClose }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const { loginWithKakao, loginWithGoogle } = useSupabaseAuth();
-
-  // useSupabaseAuth에서 login과 logout 가져오기
-  const { login, logout } = useSupabaseAuth();
+  const { login, logout, loginWithKakao, loginWithGoogle } = useSupabaseAuth();
 
   const handleEmailLogin = async (email, password) => {
     try {
@@ -232,7 +229,7 @@ export const LoginModal = ({ onClose }) => {
           자유롭게 사용해보세요!
         </MessageText>
         <ModalImage />
-        <EmailLoginButton onClick={handleEmailLogin}>
+        <EmailLoginButton onClick={handleLoginClick}>
           이메일로 시작하기
         </EmailLoginButton>
         <KakaoLoginButton onClick={handleKakaoLogin}>

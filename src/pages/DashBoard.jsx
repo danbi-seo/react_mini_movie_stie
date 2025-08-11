@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { useSupabaseAuth } from "../supabase/auth/index";
 import { useNavigate } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { Link } from "react-router-dom";
 
 const DashBoardContainer = styled.div`
   width: 100%;
@@ -105,7 +108,7 @@ const BestMoviesSection = styled.div`
 `;
 
 const BestMoviesTitle = styled.h3`
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 20px;
 `;
@@ -124,6 +127,7 @@ const AddBestMoviesButton = styled.button`
   font-weight: bold;
   cursor: pointer;
   border: none;
+  margin-top: 30px;
 `;
 
 const LogoutButton = styled.button`
@@ -137,6 +141,33 @@ const LogoutButton = styled.button`
   margin-left: auto;
 `;
 
+const BestMoviesRow = styled.div`
+  margin-top: 16px;
+`;
+
+const BestCard = styled(Link)`
+  display: block;
+  text-decoration: none;
+  color: #fff;
+`;
+
+const BestPoster = styled.img`
+  width: 100%;
+  aspect-ratio: 2 / 3; /* 2:3 포스터 */
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+`;
+
+const BestTitle = styled.div`
+  margin-top: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
 const DashBoard = () => {
   const navigate = useNavigate();
   const { getUserInfo, logout } = useSupabaseAuth(); // signOut과 getUserInfo 훅 가져오기
@@ -144,6 +175,7 @@ const DashBoard = () => {
   const [wishCount, setWishCount] = useState(0);
   const [watchingCount, setWatchingCount] = useState(0);
   const [watchedCount, setWatchedCount] = useState(0);
+  const [bestMovies, setBestMovies] = useState([]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -165,27 +197,6 @@ const DashBoard = () => {
     setWatchedCount(likeMovies.length + dislikeMovies.length);
   }, []);
 
-  const handleLikeMovies = () => {
-    navigate("/likemovies");
-  };
-
-  const handleDisLikeMovies = () => {
-    navigate("/dislikemovies");
-  };
-
-  const handleWishList = () => {
-    navigate("/wishlist");
-  };
-  const handleWatching = () => {
-    navigate("/watching");
-  };
-  const handleWatched = () => {
-    navigate("/watched");
-  };
-  const handlebestMovies = () => {
-    navigate("/bestmovies");
-  };
-
   const moviesCounts = () => {
     const wl = JSON.parse(localStorage.getItem("wishList") || "[]");
     const wcl = JSON.parse(localStorage.getItem("watchingList") || "[]");
@@ -199,13 +210,39 @@ const DashBoard = () => {
     moviesCounts();
     // 다른 탭에서 변경 시 동기화
     const onStorage = (e) => {
-      if (["wishList", "watchingList"].includes(e.key)) {
-        refreshCounts();
+      if (["wishList", "watchingList", "watchedList"].includes(e.key)) {
+        moviesCounts();
       }
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, []);
+
+  // 인생작품 + 스토리지
+  useEffect(() => {
+    const loadBest = () => {
+      const list = JSON.parse(localStorage.getItem("bestMovies") || "[]");
+      const unique = Array.isArray(list)
+        ? list.filter((m, i, arr) => i === arr.findIndex((x) => x.id === m.id))
+        : [];
+      const sorted = unique.sort(
+        (a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0)
+      );
+      setBestMovies(sorted);
+    };
+    loadBest();
+    const onStorage = (e) => {
+      if (e.key === "bestMovies") loadBest();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const handleLikeMovies = () => navigate("/likemovies");
+  const handleDisLikeMovies = () => navigate("/dislikemovies");
+  const handleWishList = () => navigate("/wishlist");
+  const handleWatching = () => navigate("/watching");
+  const handleWatched = () => navigate("/watched");
 
   const handleLogOut = async (e) => {
     e.preventDefault();
@@ -217,11 +254,18 @@ const DashBoard = () => {
     }
   };
 
+  const getDisplayName = (user) => {
+    if (!user) return "사용자";
+    const fromCustom = user.user_metadata?.userName;
+    const fromMeta = user.user_metadata?.name || user.user_metadata?.full_name;
+    return fromCustom || fromMeta || "사용자";
+  };
+
   return (
     <DashBoardContainer>
       <ProfileHeader>
         <UserInfo>
-          <UserName>{user?.user_metadata?.userName || "사용자"}</UserName>
+          <UserName>{getDisplayName(user)}</UserName>
         </UserInfo>
         <ProfileActions>
           <LogoutButton onClick={handleLogOut}>로그아웃</LogoutButton>
@@ -255,9 +299,40 @@ const DashBoard = () => {
       </ListContainer>
 
       <BestMoviesSection>
-        <BestMoviesTitle>인생작품</BestMoviesTitle>
-        <BestMoviesContainer>등록한 인생작품이 없어요</BestMoviesContainer>
-        <AddBestMoviesButton>인생작품 등록하기</AddBestMoviesButton>
+        <BestMoviesTitle>인생영화</BestMoviesTitle>
+        {bestMovies.length === 0 ? (
+          <>
+            <BestMoviesContainer>등록한 인생영화가 없어요</BestMoviesContainer>
+            <AddBestMoviesButton onClick={() => navigate("/bestmovies")}>
+              인생영화 등록하기
+            </AddBestMoviesButton>
+          </>
+        ) : (
+          <>
+            <BestMoviesRow>
+              <Swiper slidesPerView={4.5} spaceBetween={12}>
+                {bestMovies.map((m) => (
+                  <SwiperSlide key={m.id}>
+                    <BestCard to={`/movie/${m.id}`}>
+                      <BestPoster
+                        src={
+                          m.poster_path
+                            ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
+                            : "/placeholder.jpg"
+                        }
+                        alt={m.title}
+                      />
+                      <BestTitle>{m.title}</BestTitle>
+                    </BestCard>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </BestMoviesRow>
+            <AddBestMoviesButton onClick={() => navigate("/bestmovies")}>
+              더 보기
+            </AddBestMoviesButton>
+          </>
+        )}
       </BestMoviesSection>
     </DashBoardContainer>
   );
