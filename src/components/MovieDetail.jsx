@@ -414,8 +414,11 @@ const MovieDetail = () => {
   }, [likeMovies, disLikeMovies]);
 
   useEffect(() => {
+    localStorage.setItem("wishList", JSON.stringify(wishList));
+    localStorage.setItem("watchingList", JSON.stringify(watchingList));
+    localStorage.setItem("watchedList", JSON.stringify(watchedList));
     localStorage.setItem("bestMovies", JSON.stringify(bestMovies));
-  }, [bestMovies]);
+  }, [wishList, watchingList, watchedList, bestMovies]);
 
   const backdropUrl = movieData?.backdrop_path
     ? `${IMAGE_BASE_URL}${BACKDROP_SIZE}${movieData.backdrop_path}`

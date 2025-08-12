@@ -203,8 +203,7 @@ export const LoginModal = ({ onClose }) => {
     navigate("/signup");
   };
 
-  // 컴포넌트 마운트 시 또는 상태 변경 시 로그인 여부 확인
-  // localStorage/sessionStorage에서 토큰 확인
+  // 컴포넌트 마운트 시 또는 상태 변경 시 로그인 확인
   const handleLogout = async () => {
     try {
       await logout();
