@@ -197,3 +197,33 @@ export const fetchTrendingMovies = async (time_window) => {
     return [];
   }
 };
+
+// 최근 월간 인기순 영화 가져오기
+export const fetchMonthlyMovies = async (days = 30, page = 1) => {
+  try {
+    const today = new Date();
+    const from = new Date();
+    from.setDate(today.getDate() - (days - 1));
+
+    const gte = from.toISOString().slice(0, 10); // YYYY-MM-DD
+    const lte = today.toISOString().slice(0, 10);
+
+    const res = await axios.get(`${baseUrl}/discover/movie`, {
+      headers: tmdbHeaders,
+      params: {
+        language: "ko-KR",
+        sort_by: "popularity.desc",
+        include_adult: false,
+        include_video: false,
+        "primary_release_date.gte": gte,
+        "primary_release_date.lte": lte,
+        page,
+      },
+    });
+
+    return res.data.results || [];
+  } catch (error) {
+    console.error("월간 영화 fetch 실패:", error);
+    return [];
+  }
+};

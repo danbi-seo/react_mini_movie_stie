@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { fetchTrendingMovies } from "../API/tmdbapi";
+import { fetchTrendingMovies, fetchMonthlyMovies } from "../API/tmdbapi";
 
 // 전체 컨테이너
 const RankingContainer = styled.div`
@@ -145,12 +145,17 @@ export const RankingPage = () => {
     const getMovies = async () => {
       setLoading(true);
       try {
-        // sortMode에 따라 다른 기간의 트렌딩 영화를 가져오는 함수를 호출
-        const trendingMovies = await fetchTrendingMovies(sortMode);
-        setMovies(trendingMovies);
+        let list = [];
+        if (sortMode === "month") {
+          list = await fetchMonthlyMovies(30, 1); // 최근 30일, 1페이지
+        } else {
+          // 'day' 또는 'week'
+          list = await fetchTrendingMovies(sortMode);
+        }
+        setMovies(list || []);
       } catch (error) {
         console.error("영화 랭킹 정보를 가져오는 데 실패했습니다.", error);
-        setMovies([]); // 실패 시 빈 배열로 설정
+        setMovies([]);
       } finally {
         setLoading(false);
       }
@@ -180,8 +185,8 @@ export const RankingPage = () => {
           주간
         </FilterButton>
         <FilterButton
-          $active={sortMode === "year"}
-          onClick={() => setSortMode("year")}
+          $active={sortMode === "month"}
+          onClick={() => setSortMode("month")}
         >
           월간
         </FilterButton>

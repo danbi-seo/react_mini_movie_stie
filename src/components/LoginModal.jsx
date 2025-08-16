@@ -171,6 +171,7 @@ export const LoginModal = ({ onClose }) => {
       //로그인 함수 호출
       const result = await login(email, password);
       if (result.user) {
+        onClose?.();
         navigate("/"); // 로그인 후 메인페이지로 이동
       } else {
         alert("로그인에 실패했습니다. 다시 시도해주세요!");
@@ -215,6 +216,7 @@ export const LoginModal = ({ onClose }) => {
   };
 
   const handleLoginClick = () => {
+    onClose?.();
     navigate("/login");
   };
 

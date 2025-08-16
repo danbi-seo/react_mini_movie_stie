@@ -103,7 +103,7 @@ const ListItemText = styled.p`
 
 const BestMoviesSection = styled.div`
   text-align: center;
-  margin-top: 50px;
+  margin-top: 30px;
   padding-bottom: 50px;
 `;
 

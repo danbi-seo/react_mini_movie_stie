@@ -103,27 +103,29 @@ const NavTop = () => {
   const navigate = useNavigate(); // 페이지 이동을 위해 useNavigate 훅 사용
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // 로그인 안 했을 때 모달
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // 로그인 했을 때 유저 메뉴 모달
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 (시뮬레이션)
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const [userName, setUserName] = useState("");
   const [userProfileImg, setUserProfileImg] = useState("");
   const iconRef = useRef(null); // 아이콘 DOM 요소 참조를 위한 ref
   const [isDarkMode, setIsDarkMode] = useState(false); // 다크모드 상태
 
-  const getDisplayName = (user) => {
-    if (!user) return "사용자";
-    const fromCustom = user.user_metadata?.userName;
-    const fromMeta = user.user_metadata?.name || user.user_metadata?.full_name;
-    return fromCustom || fromMeta || "사용자";
+  const getDisplayName = (u) => {
+    if (!u) return "사용자";
+    const fromCustom = u.user_metadata?.userName;
+    const fromMeta = u.user_metadata?.name || u.user_metadata?.full_name;
+    const emailLocal = u.email ? u.email.split("@")[0] : "";
+    return fromCustom || fromMeta || emailLocal || "사용자";
   };
 
   const getProfileImg = (u) =>
     u?.user_metadata?.profile_img ||
     u?.user_metadata?.avatar_url ||
     u?.user_metadata?.picture ||
+    u?.identities?.[0]?.identity_data?.picture ||
     "";
 
   useEffect(() => {
-    // 1) 최초 세션 로드
+    // 1) 초기 세션 로드
     (async () => {
       const { data } = await supabase.auth.getUser();
       const u = data?.user;
@@ -131,14 +133,13 @@ const NavTop = () => {
         setIsLoggedIn(true);
         setUserName(getDisplayName(u));
         setUserProfileImg(getProfileImg(u));
-        // 로컬 저장(선택) - NavTop이 로컬만 보던 구조와 호환
         localStorageUtils().setItemToLocalStorage(USER_INFO_KEY.customKey, u);
       }
     })();
 
     // 2) 세션 변경 구독
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      const u = session?.user || null;
+      const u = session?.user ?? null;
       if (u) {
         setIsLoggedIn(true);
         setUserName(getDisplayName(u));
@@ -152,43 +153,8 @@ const NavTop = () => {
       }
     });
 
-    return () => {
-      sub?.subscription?.unsubscribe?.();
-    };
+    return () => sub?.subscription?.unsubscribe?.();
   }, []);
-  // useEffect(() => {
-  //   const loadUser = () => {
-  //     const userInfo = localStorageUtils().getItemFromLocalStorage(
-  //       USER_INFO_KEY.customKey
-  //     );
-  //     if (userInfo && userInfo.id) {
-  //       setIsLoggedIn(true);
-  //       setUserName(getDisplayName(userInfo));
-  //       setUserProfileImg(getProfileImg(userInfo));
-  //     } else {
-  //       setIsLoggedIn(false);
-  //       setUserName("");
-  //       setUserProfileImg("");
-  //     }
-
-  //     const savedDarkMode = localStorage.getItem("darkMode") === "true";
-  //     setIsDarkMode(savedDarkMode);
-  //     document.body.classList.toggle("dark-mode", savedDarkMode);
-  //   };
-
-  //   loadUser();
-
-  //   const onStorage = (e) => {
-  //     if (e.key === USER_INFO_KEY.customKey) loadUser();
-  //     if (e.key === "darkMode") {
-  //       const v = e.newValue === "true";
-  //       setIsDarkMode(v);
-  //       document.body.classList.toggle("dark-mode", v);
-  //     }
-  //   };
-  //   window.addEventListener("storage", onStorage);
-  //   return () => window.removeEventListener("storage", onStorage);
-  // }, []);
 
   // dark mode
   useEffect(() => {
@@ -222,7 +188,7 @@ const NavTop = () => {
           <NavLogo src={movie_logoW} alt="Movie Logo" />
         </NavBrand>
         <UserProfileContainer>
-          {isLoggedIn && userName && <UserName>{userName} 님</UserName>}
+          {isLoggedIn && <UserName>{userName || "사용자"} 님</UserName>}
 
           <StyledPersonIconWrapper ref={iconRef} onClick={handleIconClick}>
             {isLoggedIn && userProfileImg ? (
