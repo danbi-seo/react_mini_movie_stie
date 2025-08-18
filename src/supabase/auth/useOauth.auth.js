@@ -8,7 +8,7 @@ export const useOAuth = () => {
       await supabase.auth.signInWithOAuth({
         provider: "kakao",
         options: {
-          redirectTo,
+          redirectTo: "https://react-mini-movie-site.vercel.app/",
           ...otherOptions,
         },
       });
@@ -23,7 +23,7 @@ export const useOAuth = () => {
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo,
+          redirectTo: "https://react-mini-movie-site.vercel.app/",
           ...otherOptions,
         },
       });
